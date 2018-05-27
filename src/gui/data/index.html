@@ -1,141 +1,70 @@
 <!doctype html>
 <html>
     <head>
-            <link rel="stylesheet" type="text/css" href="progress.css">
-            <link rel="stylesheet" type="text/css" href="style.css">
             <style>
-                    .progress_container {
-                        width: 213px;
+                .wrapper {
+                    width: 170px; /* Set the size of the progress bar */
+                    height: 170px;
+                    position: absolute; /* Enable clipping */
+                    clip: rect(0px, 150px, 150px, 75px); /* Hide half of the progress bar */
                     }
-                    
-                    .progress {
-                        overflow: hidden;
-                        height: 18px;
-                        margin-bottom: 18px;
-                        background-color: #89949B;
-                        background-image: -moz-linear-gradient(top, #f5f5f5, #f9f9f9);
-                        background-image: -ms-linear-gradient(top, #f5f5f5, #f9f9f9);
-                        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#f5f5f5), to(#f9f9f9));
-                        background-image: -webkit-linear-gradient(top, #f5f5f5, #f9f9f9);
-                        background-image: -o-linear-gradient(top, #f5f5f5, #f9f9f9);
-                        background-image: linear-gradient(top, #f5f5f5, #f9f9f9);
-                        background-repeat: repeat-x;
-                        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f5f5f5', endColorstr='#f9f9f9', GradientType=0);
-                        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-                        -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-                        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-                        -webkit-border-radius: 4px;
-                        -moz-border-radius: 4px;
-                        border-radius: 4px;
+                    /* Set the sizes of the elements that make up the progress bar */
+                .circle {
+                    width: 130px;
+                    height: 130px;
+                    border: 10px solid #88C057;
+                    border-radius: 93px;
+                    position: absolute;
+                    clip: rect(0px, 75px, 150px, 0px);
+                    transition: transform  0.3s;
+                    transform: rotate(0deg);
                     }
-                    
-                    .progress .bar {
-                        width: 0%;
-                        height: 18px;
-                        color: #ffffff;
-                        font-size: 12px;
-                        text-align: center;
-                        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-                        background-color: #0e90d2;
-                        background-image: -moz-linear-gradient(top, #149bdf, #0480be);
-                        background-image: -ms-linear-gradient(top, #149bdf, #0480be);
-                        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#149bdf), to(#0480be));
-                        background-image: -webkit-linear-gradient(top, #149bdf, #0480be);
-                        background-image: -o-linear-gradient(top, #149bdf, #0480be);
-                        background-image: linear-gradient(top, #149bdf, #0480be);
-                        background-repeat: repeat-x;
-                        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#149bdf', endColorstr='#0480be', GradientType=0);
-                        -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-                        -moz-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-                        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-                        -webkit-box-sizing: border-box;
-                        -moz-box-sizing: border-box;
-                        box-sizing: border-box;
-                        -webkit-transition: width 0.6s ease;
-                        -moz-transition: width 0.6s ease;
-                        -ms-transition: width 0.6s ease;
-                        -o-transition: width 0.6s ease;
-                        transition: width 0.6s ease;
-                    }
-                    
-                    .progress-striped .bar {
-                        background-color: #89949B;
-                        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
-                        background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        -webkit-background-size: 40px 40px;
-                        -moz-background-size: 40px 40px;
-                        -o-background-size: 40px 40px;
-                        background-size: 40px 40px;
-                    }
-                    
-                    .progress.active .bar {
-                        -webkit-animation: progress-bar-stripes 2s linear infinite;
-                        -moz-animation: progress-bar-stripes 2s linear infinite;
-                        animation: progress-bar-stripes 2s linear infinite;
-                    }
-                    
-                    .progress-danger .bar {
-                        background-color: #89949B;
-                        background-image: -moz-linear-gradient(top, #89949B, #c43c35);
-                        background-image: -ms-linear-gradient(top, #89949B, #c43c35);
-                        background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ee5f5b), to(#c43c35));
-                        background-image: -webkit-linear-gradient(top, #ee5f5b, #c43c35);
-                        background-image: -o-linear-gradient(top, #89949B, #c43c35);
-                        background-image: linear-gradient(top, #89949B, #c43c35);
-                        background-repeat: repeat-x;
-                        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ee5f5b', endColorstr='#c43c35', GradientType=0);
-                    }
-                    
-                    .progress-danger.progress-striped .bar {
-                        background-color: #1ABC9C;
-                        background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, rgba(255, 255, 255, 0.15)), color-stop(0.25, transparent), color-stop(0.5, transparent), color-stop(0.5, rgba(255, 255, 255, 0.15)), color-stop(0.75, rgba(255, 255, 255, 0.15)), color-stop(0.75, transparent), to(transparent));
-                        background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                        background-image: linear-gradient(-45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-                    }
-                    
-                    
-                    
-                    
-                    @-webkit-keyframes progress-bar-stripes { 
-                        from { background-position: 0 0 }
-                    
-                        to { background-position: 40px 0 }
-                    }
-                    
-                    @-moz-keyframes progress-bar-stripes { 
-                        from { background-position: 0 0 }
-                    
-                        to { background-position: 40px 0 }
-                    }
-                    
-                    @keyframes progress-bar-stripes { 
-                        from { background-position: 0 0 }
-                    
-                        to { background-position: 40px 0 }
-                    }</style>
-            <style>body{
-                    width: 215px;
-                    text-align: center
+            </style>
+            <style>
+                body{
+                    background: #2F374A;
+                    width: 300px;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                    text-align: center;
+                    padding-top: 30px;
+                    color:#e0e0e0;
+                    cursor:default;
+                    -webkit-touch-callout: none; /* iOS Safari */
+                    -webkit-user-select: none; /* Safari */
+                    -khtml-user-select: none; /* Konqueror HTML */
+                    -moz-user-select: none; /* Firefox */
+                        -ms-user-select: none; /* Internet Explorer/Edge */
+                            user-select: none; /* Non-prefixed version, currently
+                                                supported by Chrome and Opera */
                 }
-                #select-ip{
-                    width: 200px;
+                
+                #choose{
+                    float:right
                 }
                 
                 .form{
-                    padding-top: 50px;
+                    padding-top: 10px;
                 }
                 
-                .progress_pointer{
+                .progress_container{
+                    width: 150px;
+                    margin: auto;
+                    height: 150px;
+                    /* background: red; */
+                }
+
+                
+                #progress_pointer{
                     float: right;
-                    color:goldenrod;
-                    font-weight: 700
+                    font-size: 25px;
+                    color:#ffffff;
+                    font-weight: 700;
+                    position: relative;
+                    top:60px;
+                    width:120px;
+                    text-align: center;
+                    right:15px;
                 }
                 
                 .now_file{
@@ -143,8 +72,15 @@
                   float: left; 
                 }
                 
-                .form-buttons{
-                    padding-top: 50px;
+                .form_buttons{
+                    padding-top: 30px;
+                    
+                    margin: auto;
+                    width: 200px;
+
+                }
+                .choosen_directory{
+                    float: left;
                 }
                 
                 .animate
@@ -152,88 +88,172 @@
                     transition: all 0.1s;
                     -webkit-transition: all 0.1s;
                 }
-                
-                .action-button
-                {
-                    position: relative;
-                    padding: 5px 20px;
-                    margin: 0px 5px 10px 0px;
-                    border-radius: 5px;
-                    font-family: 'Pacifico', cursive;
-                    font-size: 15px;
-                    color: #FFF;
-                    text-decoration: none;	
+                .action_button{
+                    cursor: pointer;
+                    width:max-content;
+                    display: inline;
+                    user-select: none;
+                    text-decoration: none;
+                }
+                .action_button:hover{
+                    color: red;
+                }
+                .form_select{
+                    color:#ffffff9d;
+                    margin-top: 20px;
+                }
+                #select_ip{
+                    width: 120px;
+                    border-radius: 2.5px;
+                    background: #c4c4c4;
+                    margin-left: 10px;
                 }
                 
-                .blue
-                {
-                    background-color: #3498DB;
-                    border-bottom: 5px solid #2980B9;
-                    text-shadow: 0px -2px #2980B9;
-                }
-                
-                .red
-                {
-                    background-color: #E74C3C;
-                    border-bottom: 5px solid #BD3E31;
-                    text-shadow: 0px -2px #BD3E31;
-                }
                 #begin{
-                    opacity: 0.3;
+                    /* opacity: 0.3; */
+                    margin-top: 20px;
+                    
+                }
+                #begin_svg{
+                    width: 50px;
+                    margin:auto;
+                }
+                .active_button_start{
+                    transition: all 0.2s ease-in-out;
+                    cursor: pointer;
+                    border-radius: 50%;
+                    box-shadow: 0px 0px 40px -10px rgba(0,0,0,0.49);
+                    opacity: 0.7
+                }
+                .active_button_start:hover{
+                    box-shadow: 0px 0px 45px -6px rgba(0,0,0,1);
+                    opacity: 1
+                }
+                .active_button_start:active{
+                    box-shadow: none;
+                    opacity: 0.9
+                }
+                #alert{
+                    color:red;
+                    text-align: center;
+                    height: 15px;
+                    margin-top: 10px;
                 }
                 </style>
     </head>
     <body>
+           
+
             <div class="progress_container">
-                    <div class="progress progress-danger
-                         progress-striped active">
-                      <div class="bar"></div>
+                    <div class="wrapper" data-anim="base wrapper" id="wrapper">
+                            <div class="circle" data-anim="base left" id="circle_left"></div>
+                            <div class="circle" data-anim="base right" id="circle_right"></div>
+                     </div>
+                     <div id="progress_pointer">
+                         0%
+                     </div>
                       
+                
+            </div>
+            <div class="form_buttons">
+                    <div class="choosen_directory">
+                         Directory: <span id='choosen_directory'>none</span>
+                    </div>
+                    <div type="button" id="choose" class="action_button">
+                            Choose!
                     </div>
                     
-            </div>
-            <div class="progress_about">
-                    <div class="now_file">...</div>
-                    <div class="progress_pointer">0%</div>
-            </div>
+                </div>
+    
+                <div class='form'>
+                        <div class="form_select">
+                                <span>Receiver IP: </span>       
+                                <select id="select_ip">
+                                   <option value="127.0.0.1">127.0.0.1</option>    
+                                </select>
+                        </div>
             
-
-            <div class='form'>
-                <div class="form-select">
-                        <span>receiver</span>       
-                        <select id="select-ip">
-                               
-                        </select>
-                </div>
-                
-                <div class="form-buttons">
-                        <div>
-                                Directory: <span id='choosen_directory'>none</span>
-                            </div>
-                    <button type="button" id="choose" class="action-button shadow animate blue">Choose Directory!</button>
-                    <button type="button" id="begin" class="action-button shadow animate blue" disabled>Begin!</button>
-                </div>
+            <div id="alert"></div>
             </div>
+            <div  id="begin">
+                <div id="begin_svg" onclick="startLoad()">
+                <svg  class="active_button_start" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="30px" height="30px" viewBox="0 0 54 54" style="enable-background:new 0 0 54 54;" xml:space="preserve">
+                    <g>
+                            <g>
+                                <path style="fill:#88C057;" d="M53,27L53,27c0,14.359-11.641,26-26,26h0C12.641,53,1,41.359,1,27v0C1,12.641,12.641,1,27,1h0
+                                    C41.359,1,53,12.641,53,27z"/>
+                                <path style="fill:#88C057;" d="M27,54C12.112,54,0,41.888,0,27S12.112,0,27,0s27,12.112,27,27S41.888,54,27,54z M27,2
+                                    C13.215,2,2,13.215,2,27s11.215,25,25,25s25-11.215,25-25S40.785,2,27,2z"/>
+                            </g>
+                            <g>
+                                <path style="fill:#FFFFFF;" d="M28.017,17.856l8.719,15.101C37.004,33.421,36.669,34,36.134,34H18.696
+                                    c-0.535,0-0.87-0.579-0.602-1.043l8.719-15.101C27.081,17.392,27.75,17.392,28.017,17.856z"/>
+                                <path style="fill:#FFFFFF;" d="M36.134,35H18.696c-0.613,0-1.162-0.316-1.469-0.848c-0.306-0.53-0.307-1.164,0-1.695l8.719-15.102
+                                    c0.307-0.53,0.855-0.848,1.469-0.848s1.162,0.317,1.469,0.848l8.719,15.102c0.307,0.531,0.306,1.165,0,1.695
+                                    C37.296,34.684,36.747,35,36.134,35z M19.224,33h16.383l-8.191-14.188L19.224,33z"/>
+                            </g>
+                        </g>
+                </svg>
+                </div>
+                        
+                </div>
             <!-- <input id="files" type="file" webkitdirectory directory multiple/> -->
             <script>
                 document.getElementById('choose').addEventListener("click", chooseFunc);
-                document.getElementById('begin').addEventListener("click", beginFunc);
-
+                // document.getElementById('begin_svg').addEventListener('click', start)
                 window.transData = {path: "none"};
+                var last_fin = 0;
+                function startLoad(){
+                    console.log("Hello")
+                    if(window.transData.path=="none"){
+                        document.getElementById("alert").innerHTML="Choose directory!!!"
+                    }else{
+                        document.getElementById("alert").innerHTML=""
+                    }
+                }
+                
+
+                function sleep (time, resolve) {
+                    (function (resolve) {
+                        setTimeout(function () { 
+                            resolve();
+                        },time)
+                    })(resolve)
+                }  
+
+                function progress(val){
+                    var fin = 3.6* val
+                    if(fin>180){
+                        document.getElementById("circle_left").style.transform = "rotate(180deg)"
+                        document.getElementById("circle_right").style.transform = "rotate("+fin+"deg)"
+                        
+                        // bug with transitions
+                        if(last_fin<=180){
+                            sleep(300, function(){
+                                document.getElementById("wrapper").style.clip="rect(auto,auto,auto,auto)" 
+                            });
+                        }
+                        last_fin = fin;
+                        
+                    }else{
+                        document.getElementById("wrapper").style.clip="rect(0px,150px,150px,75px)"
+                        document.getElementById("circle_left").style.transform = "rotate("+fin+"deg)"
+                        document.getElementById("circle_right").style.transform = "rotate(0deg)"
+                        last_fin = fin;
+                    }
+                    document.getElementById('progress_pointer').innerHTML = event.target.value+"%"
+                }
+
+
+                
                 function chooseFunc(){
                     window.external.invoke('opendir');
-                    var path = window.transData.path
-                   if(window.transData.path.length>=10){path = window.transData.path.slice(0,7)}
                     if(window.transData.path.length==0){
                         window.transData.path = "none"
-                        document.getElementById("begin").setAttribute('disabled')
-                        document.getElementById("begin").style.opacity = 0.3
-                    }else{
-                        document.getElementById("begin").removeAttribute('disabled')
-                        document.getElementById("begin").style.opacity = 1
                     }
+                    var path =  window.transData.path
+                    if(window.transData.path.length>=10){path = window.transData.path.slice(0,7)}
                     document.getElementById('choosen_directory').innerHTML = path;
-                    
                 }
 
                 function beginFunc(){

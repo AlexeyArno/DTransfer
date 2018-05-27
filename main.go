@@ -27,11 +27,11 @@ func main() {
 
 	url := network.StartServer()
 	w := webview.New(webview.Settings{
-		Title: "Directory Transfer",
+		Title: "DTransfer",
 		URL:   url,
 		// URL:                    `data:text/html,` + url.PathEscape(string(data)),
-		Width:                  215,
-		Height:                 300,
+		Width:                  300,
+		Height:                 400,
 		ExternalInvokeCallback: gui.HandleRPC})
 
 	// gui.ConnectGUIs(&w)
