@@ -1,30 +1,19 @@
 package network
 
-import (
-	"log"
-	"net"
-	"net/http"
+import "log"
 
-	"github.com/AlexeyArno/golang-files-transfer/src/gui"
-)
+func StartScanNetworks(CIDR_addresses []string) {
+	var networksIP []IP
 
-func StartServer() string {
-	data, err := gui.Asset("data/index.html")
-	if err != nil {
-		panic(err)
+	var ip IP
+	for _, addr := range CIDR_addresses {
+		err := ip.FromString(addr)
+		if err == nil {
+			networksIP = append(networksIP, ip)
+			ip.GetNetwork()
+		} else {
+			log.Println(err)
+		}
 	}
-	ln, err := net.Listen("tcp", "127.0.0.1:1234")
-	if err != nil {
-		log.Fatal(err)
-	}
-	go func() {
-		defer ln.Close()
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write(data)
-		})
 
-		log.Fatal(http.Serve(ln, nil))
-	}()
-
-	return "http://" + ln.Addr().String()
 }
