@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
-	gui "github.com/AlexeyArno/golang-files-transfer/src/gui"
 	"github.com/AlexeyArno/golang-files-transfer/src/network"
-	"github.com/zserge/webview"
 )
+
+var close = make(chan struct{})
 
 func sayHello(w http.ResponseWriter, r *http.Request) {
 	message := r.URL.Path
@@ -24,18 +24,19 @@ func main() {
 	// 		panic(err)
 	// 	}
 	// }()
+	// close <- struct{}{}
+	network.StartServer()
+	// w := webview.New(webview.Settings{
+	// 	Title: "DTransfer",
+	// 	URL:   url,
+	// 	// URL:                    `data:text/html,` + url.PathEscape(string(data)),
+	// 	Width:                  300,
+	// 	Height:                 400,
+	// 	ExternalInvokeCallback: gui.HandleRPC})
 
-	url := network.StartServer()
-	w := webview.New(webview.Settings{
-		Title: "DTransfer",
-		URL:   url,
-		// URL:                    `data:text/html,` + url.PathEscape(string(data)),
-		Width:                  300,
-		Height:                 400,
-		ExternalInvokeCallback: gui.HandleRPC})
-
-	// gui.ConnectGUIs(&w)
-	defer w.Exit()
-	w.Run()
+	// // gui.ConnectGUIs(&w)
+	// defer w.Exit()
+	// w.Run()
+	<-close
 
 }
