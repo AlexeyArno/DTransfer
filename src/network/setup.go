@@ -1,27 +1,43 @@
 package network
 
+import (
+	"log"
+
+	"github.com/AlexeyArno/golang-files-transfer/src/utility"
+)
+
+var messages chan (string) = make(chan string, 4)
+
+func init() {
+	myAddress, err := utility.MyIP()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	port, err := ReservUDPPort()
+	if err != nil {
+		log.Println("Setup: ", err)
+		return
+	}
+	log.Println("My Address:", myAddress)
+	go Listen(myAddress, port, IPFound, &messages)
+	go BroadcastTo(myAddress, port, &messages)
+	ScanNetwork()
+
+}
+
+func ScanNetwork() {
+	for _, j := range AvailabalePortsUDP {
+		messages <- "255.255.255.255:" + j
+	}
+}
+
+func IPFound(ip string) {
+	log.Println("Ip Found: ", ip)
+}
+
 //StartServer start server
 func StartServer() string {
-	// // data, err := gui.Asset("data/index.html")
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	StartScanNetworks()
-
-	// ln, err := net.Listen("tcp", "127.0.0.1:1235")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// go func() {
-	// 	defer ln.Close()
-	// 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 		w.Write(data)
-	// 	})
-
-	// 	log.Fatal(http.Serve(ln, nil))
-	// }()
-
-	// return "http://" + ln.Addr().String()
+	// go StartScanNetworks(printFound)
 	return "192.0.0.0"
 }
