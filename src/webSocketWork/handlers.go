@@ -4,7 +4,6 @@ import (
 	"log"
 	"sync"
 
-	gui "github.com/AlexeyArno/golang-files-transfer/src/gui"
 	"golang.org/x/net/websocket"
 )
 
@@ -21,69 +20,46 @@ func init() {
 }
 
 func DataHandler(ws *websocket.Conn) {
-	gui.Log("Client conn to data-channel: " + ws.RemoteAddr().String())
-	log.Println("Client conn to data-channel: ", ws.RemoteAddr().String())
-	enteringData <- ws
-	go socketListener(ws, 0)
-}
 
-func InfoHandler(ws *websocket.Conn) {
-	gui.Log("Client conn to info-channel: " + ws.RemoteAddr().String())
-	log.Println("Client conn to info-channel: ", ws.RemoteAddr().String())
-	enteringInfo <- ws
-	go socketListener(ws, 1)
+	log.Println("Client origin: ", ws.Config().Origin.Host, "conn to data-channel location ", ws.Config().Location.Host)
+	enteringData <- ws
+	listenDataChannel(ws, 1)
 }
 
 // WebsocketService process all new and old websocket connections
 func WebsocketService() {
 	for {
 		select {
-		case c := <-enteringInfo:
-			m := machineIsHere(c)
-			if m != nil {
-				(*m).infoConn = c
-				(*m).IP = c.RemoteAddr().String()
-			} else {
-				machinesLocker.Lock()
-				nMachine := machine{infoConn: c}
-				nMachine.IP = c.RemoteAddr().String()
 
-				machines = append(machines, &nMachine)
-				machinesLocker.Unlock()
-			}
 		case c := <-enteringData:
+			if c == nil {
+				log.Println("Data channel faile")
+				return
+			}
 			m := machineIsHere(c)
 			if m != nil {
 				(*m).dataConn = c
-				(*m).IP = c.RemoteAddr().String()
+				(*m).IP = c.Config().Origin.Host
+				// log.Println("Data channel connected")
 			} else {
 				machinesLocker.Lock()
 				nMachine := machine{dataConn: c}
-				nMachine.IP = c.RemoteAddr().String()
+				nMachine.IP = c.Config().Origin.Host
 
 				machines = append(machines, &nMachine)
+				// log.Println("Data channel connected")
 				machinesLocker.Unlock()
 			}
 		case c := <-leaving:
 			m := machineIsHere(c)
 			if m != nil {
+				log.Println(m)
 				if (*m).dataConn != nil {
 					(*m).dataConn.Close()
 				}
-				if (*m).infoConn != nil {
-					(*m).infoConn.Close()
-				}
-				machinesLocker.Lock()
-				for i, machine := range machines {
-					if (*machine).IP == (*m).IP {
-						machines[i] = machines[len(machines)-1]
-						machines[len(machines)-1] = nil
-						machines = machines[:len(machines)-1]
-						break
-					}
-				}
-				machinesLocker.Unlock()
+				deleteMachine(m)
 				m = nil
+				log.Println("Machine deleted")
 			}
 		}
 	}
@@ -93,9 +69,23 @@ func machineIsHere(w *websocket.Conn) *machine {
 	machinesLocker.Lock()
 	defer machinesLocker.Unlock()
 	for _, m := range machines {
-		if (*m).IP == w.RemoteAddr().String() {
+		if (*m).IP == w.Config().Origin.Host {
 			return m
 		}
 	}
 	return nil
+}
+
+func deleteMachine(m *machine) {
+	machinesLocker.Lock()
+	for i, machine := range machines {
+		if (*machine).IP == (*m).IP {
+			machines[i] = machines[len(machines)-1]
+			machines[len(machines)-1] = nil
+			machines = machines[:len(machines)-1]
+			break
+		}
+	}
+	machinesLocker.Unlock()
+
 }

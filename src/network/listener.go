@@ -1,7 +1,6 @@
 package network
 
 import (
-	"fmt"
 	"log"
 	"net"
 
@@ -34,10 +33,10 @@ func Listen(myAddressWPort string, port string, ipFound func(string), messages *
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
 		cleanIP := utility.GetCleanIPFromString(addr.String())
-		fmt.Println(cleanIP)
-		if cleanIP != myAddressWPort+":"+port {
+		// fmt.Println(cleanIP)
+		if addr.String() != myAddressWPort+":"+port {
 			if !stringInSlice(string(buf[0:n]), usefullIps) {
-				gotUsefullIP(cleanIP)
+				gotUsefullIP(cleanIP, port)
 			}
 		}
 		if err != nil {
@@ -55,10 +54,12 @@ func stringInSlice(a string, list []string) bool {
 	return false
 }
 
-func gotUsefullIP(ip string) {
+func gotUsefullIP(ip string, myport string) {
 
 	IPFound(ip)
 	for _, port := range AvailabalePortsTCP {
-		webSocketWork.ConnectTo(ip + ":" + port)
+		if port != myport {
+			go webSocketWork.ConnectTo(ip + ":" + port)
+		}
 	}
 }

@@ -23,7 +23,6 @@ func main() {
 		w.Write(data)
 	})
 	http.Handle("/websocket_data", websocket.Handler(webSocketWork.DataHandler))
-	http.Handle("/websocket_info", websocket.Handler(webSocketWork.InfoHandler))
 
 	port, err := network.ReservTCPPort()
 	if err != nil {
@@ -48,7 +47,7 @@ func main() {
 		ExternalInvokeCallback: gui.HandleRPC})
 	gui.RegisterGUI(&w)
 	defer w.Exit()
-	// w.Run()
+	w.Run()
 	<-close
 
 }

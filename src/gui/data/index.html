@@ -136,7 +136,7 @@
                     margin-left: -5px;
                 }
                 #select_ip{
-                    width: 105px;
+                    width: 125px;
                     border-radius: 2.5px;
                     background: #c4c4c4;
                     margin-left: 10px;
@@ -241,7 +241,6 @@
                 <div class="form_select">
                     <span>Send to: </span>       
                     <select id="select_ip">
-                        <option value="127.0.0.1">127.0.0.1</option>    
                     </select>
                     <div id="reload_ips">
                         <svg class="button_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 28.265 28.265" style="enable-background:new 0 0 28.265 28.265;" xml:space="preserve" width="512px" height="512px">
@@ -305,7 +304,7 @@
                     ips.forEach(function(element){
                         newEl = document.createElement('option')
                         newEl.value = element
-                        newEl.innerText = element
+                        newEl.innerText = element.split(':')[0]
                         selector.appendChild(newEl)
                     });
                 }

@@ -2,41 +2,27 @@ package webSocketWork
 
 import (
 	"fmt"
+	"log"
 
 	"golang.org/x/net/websocket"
 )
 
 // socketListener listen socket for new message
 // connType: 0 - info , 1 - data connection
-func socketListener(ws *websocket.Conn, connType uint8) {
-	if connType == 0 {
-		listenInfoChannel(ws)
-	} else {
-		listenDataChannel(ws)
-	}
-	leaving <- ws
-}
 
-func listenDataChannel(ws *websocket.Conn) {
+func listenDataChannel(ws *websocket.Conn, clientOrServer uint8) {
+	log.Println("Goroutin 2 spawn")
 	msg := make([]byte, 1024)
 	for {
-		if n, err := ws.Read(msg); err != nil {
+		err := websocket.Message.Receive(ws, &msg)
+		if err != nil {
+			log.Println("Data channel 2, type ", clientOrServer, " error: ", err)
 			break
 		} else {
-			fmt.Printf("Received: %s.\n", msg[:n])
+			fmt.Printf("Received: %s.\n", msg)
 		}
 	}
-}
-
-func listenInfoChannel(ws *websocket.Conn) {
-	var msg string
-	for {
-		if err := websocket.Message.Receive(ws, &msg); err != nil {
-			break
-		} else {
-
-		}
-	}
+	leaving <- ws
 }
 
 func messageGetData() {
