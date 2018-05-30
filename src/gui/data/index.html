@@ -5,19 +5,21 @@
                 .wrapper {
                     width: 170px; /* Set the size of the progress bar */
                     height: 170px;
+                    z-index: 1200px;
                     position: absolute; /* Enable clipping */
                     clip: rect(0px, 150px, 150px, 75px); /* Hide half of the progress bar */
                     }
                     /* Set the sizes of the elements that make up the progress bar */
                 .circle {
+                    z-index: 1200px;
                     width: 130px;
                     height: 130px;
                     border: 10px solid #88C057;
                     border-radius: 93px;
                     position: absolute;
                     clip: rect(0px, 75px, 150px, 0px);
-                    transition: transform  0.3s;
-                    transform: rotate(0deg);
+                    /* transition: transform  0.3s; */
+                    /* transform: rotate(0deg); */
                     }
             </style>
             <style>
@@ -27,7 +29,7 @@
                     font-family: Arial, Helvetica, sans-serif;
                     font-size: 12px;
                     text-align: center;
-                    padding-top: 30px;
+                    padding-top: 10px;
                     color:#e0e0e0;
                     cursor:default;
                     -webkit-touch-callout: none; /* iOS Safari */
@@ -38,19 +40,24 @@
                             user-select: none; /* Non-prefixed version, currently
                                                 supported by Chrome and Opera */
                 }
-                
-                #choose{
-                    float:right
+                /* Top */
+                #myIP{
+                    padding-bottom: 20px;
+                   
                 }
-                
-                .form{
-                    padding-top: 10px;
+                .myIP{
+                    opacity: 0.5;
                 }
-                
+               
+                /* Progress  */
                 .progress_container{
                     width: 150px;
                     margin: auto;
                     height: 150px;
+                    /* top:-130px; */
+                    /* position: relative; */
+                    /* z-index: 1200; */
+                    margin-top: 18px;
                     /* background: red; */
                 }
 
@@ -65,6 +72,30 @@
                     width:120px;
                     text-align: center;
                     right:15px;
+                
+                }
+
+                .loader_shadow{
+                    width: 130px;
+                    margin: auto;
+                    position: absolute;
+                    height: 130px;
+                    z-index: 12;
+                    left:83px;
+                    top:50px;
+                    /* background: blue; */
+                    border-radius: 50%;
+                    border: 10px solid rgba(0,0,0,0.1);
+
+                }
+
+                 
+                 #choose{
+                    float:right
+                }
+                
+                .form{
+                    padding-top: 10px;
                 }
                 
                 .now_file{
@@ -72,7 +103,8 @@
                   float: left; 
                 }
                 
-                .form_buttons{
+                /* Direcory  */
+                .directory_form{
                     padding-top: 30px;
                     
                     margin: auto;
@@ -101,9 +133,10 @@
                 .form_select{
                     color:#ffffff9d;
                     margin-top: 20px;
+                    margin-left: -5px;
                 }
                 #select_ip{
-                    width: 120px;
+                    width: 105px;
                     border-radius: 2.5px;
                     background: #c4c4c4;
                     margin-left: 10px;
@@ -121,7 +154,6 @@
                     width: 50px;
                     height: 50px;
                     margin:auto;
-                    pointer-events: none;
                 }
                 .image_button{
                     width: 50px;
@@ -136,7 +168,6 @@
                     transition: all 0.1s ease-in-out;
                     cursor: pointer;
                     opacity: 0.9;
-                    pointer-events: none;
                     height: 30px;
                     width: 30px;
                 }
@@ -161,75 +192,124 @@
                     opacity: 0.3;
                     overflow: hidden;
                 }
+                #reload_ips{
+                    width:20px;
+                    height: 20px;
+                    display: inline;
+                    position: relative;
+                    top:4px;
+                    left:5px;
+                    cursor: pointer;
+                    opacity: 0.6;
+                }
+                #reload_ips:hover{
+                    opacity: 0.8;
+                }
+                #reload_ips:active{
+                    opacity: 1;
+                }
+                .button_icon{
+                    width:20px;
+                    height: 20px;
+                }
                 </style>
     </head>
     <body>
            
-            <div>Your IP: <span id="myIP">127.0.0.1</span></div>
+            <div class="myIP">Your IP: <span id="myIP">127.0.0.1</span></div>
+            <div class="loader_shadow"></div>
             <div class="progress_container">
-                    <div class="wrapper" data-anim="base wrapper" id="wrapper">
-                            <div class="circle" data-anim="base left" id="circle_left"></div>
-                            <div class="circle" data-anim="base right" id="circle_right"></div>
-                     </div>
-                     <div id="progress_pointer">
-                         0%
-                     </div>
-                      
-                
-            </div>
-            <div class="form_buttons">
-                    <div class="choosen_directory">
-                         Directory: <span id='choosen_directory'>none</span>
-                    </div>
-                    <div type="button" id="choose" class="action_button">
-                            Choose!
-                    </div>
-                    
+                <div class="wrapper" data-anim="base wrapper" id="wrapper">
+                    <div class="circle" data-anim="base left" id="circle_left"></div>
+                    <div class="circle" data-anim="base right" id="circle_right"></div>
                 </div>
+                <div id="progress_pointer">
+                    0%
+                </div>
+            </div>
+           
+            <div class="directory_form">
+                <div class="choosen_directory">
+                    Directory: <span id='choosen_directory'>none</span>
+                </div>
+                <div type="button" id="choose" class="action_button">
+                    Choose!
+                </div>
+            </div>
     
-                <div class='form'>
-                        <div class="form_select">
-                                <span>Receiver IP: </span>       
-                                <select id="select_ip">
-                                   <option value="127.0.0.1">127.0.0.1</option>    
-                                </select>
-                        </div>
+            <div class='form'>
+                <div class="form_select">
+                    <span>Send to: </span>       
+                    <select id="select_ip">
+                        <option value="127.0.0.1">127.0.0.1</option>    
+                    </select>
+                    <div id="reload_ips">
+                        <svg class="button_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 28.265 28.265" style="enable-background:new 0 0 28.265 28.265;" xml:space="preserve" width="512px" height="512px">
+                            <g>
+                                    <path d="M14.133,28.265c-7.061,0-12.805-5.75-12.805-12.809c0-7.06,5.744-12.807,12.805-12.807c0.469,0,0.943,0.027,1.414,0.08   v-2.07c0-0.266,0.164-0.508,0.406-0.611c0.252-0.098,0.531-0.043,0.723,0.148l4.537,4.547c0.258,0.258,0.258,0.67,0,0.932   l-4.535,4.557c-0.193,0.188-0.473,0.246-0.725,0.143c-0.242-0.104-0.406-0.344-0.406-0.609V7.47   c-0.469-0.086-0.941-0.125-1.414-0.125c-4.473,0-8.113,3.639-8.113,8.111c0,4.471,3.641,8.113,8.113,8.113s8.111-3.643,8.111-8.113   c0-0.363,0.295-0.66,0.662-0.66h3.369c0.365,0,0.662,0.297,0.662,0.66C26.937,22.515,21.189,28.265,14.133,28.265z" fill="#FFFFFF"/>
+                                    <g>
+                                    </g>
+                            </g>
+                        </svg>
+                     </div>
+                </div>
             
-            <div id="alert"></div>
-            </div>
-            <div  id="begin">
-                <div id="begin_svg" onclick="startLoad()" title="Start or continue">
-                    <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.153 232.153" style="enable-background:new 0 0 232.153 232.153;" xml:space="preserve" width="512px" height="512px">
-                        <g id="Play">
-                            <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M203.791,99.628L49.307,2.294c-4.567-2.719-10.238-2.266-14.521-2.266   c-17.132,0-17.056,13.227-17.056,16.578v198.94c0,2.833-0.075,16.579,17.056,16.579c4.283,0,9.955,0.451,14.521-2.267   l154.483-97.333c12.68-7.545,10.489-16.449,10.489-16.449S216.471,107.172,203.791,99.628z" fill="#FFFFFF"/>
-                        </g>
-                    </svg> 
+                <div id="alert"></div>
                 </div>
-                <div id="stop_svg" onclick="stopLoad()" title="Pause">
-                    <svg  class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.679 232.679" style="enable-background:new 0 0 232.679 232.679;" xml:space="preserve" width="512px" height="512px">
-                        <g id="Pause">
-                            <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M80.543,0H35.797c-9.885,0-17.898,8.014-17.898,17.898v196.883   c0,9.885,8.013,17.898,17.898,17.898h44.746c9.885,0,17.898-8.013,17.898-17.898V17.898C98.44,8.014,90.427,0,80.543,0z M196.882,0   h-44.746c-9.886,0-17.899,8.014-17.899,17.898v196.883c0,9.885,8.013,17.898,17.899,17.898h44.746   c9.885,0,17.898-8.013,17.898-17.898V17.898C214.781,8.014,206.767,0,196.882,0z" fill="#FFFFFF"/>
-                        </g>
-                    </svg>
-                </div>
+                <div  id="begin">
+                    <div id="begin_svg" onclick="startLoad()" title="Start or continue">
+                        <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.153 232.153" style="enable-background:new 0 0 232.153 232.153;" xml:space="preserve" width="512px" height="512px">
+                            <g id="Play">
+                                <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M203.791,99.628L49.307,2.294c-4.567-2.719-10.238-2.266-14.521-2.266   c-17.132,0-17.056,13.227-17.056,16.578v198.94c0,2.833-0.075,16.579,17.056,16.579c4.283,0,9.955,0.451,14.521-2.267   l154.483-97.333c12.68-7.545,10.489-16.449,10.489-16.449S216.471,107.172,203.791,99.628z" fill="#FFFFFF"/>
+                            </g>
+                        </svg> 
+                    </div>
+                    <div id="stop_svg" onclick="stopLoad()" title="Pause">
+                        <svg  class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.679 232.679" style="enable-background:new 0 0 232.679 232.679;" xml:space="preserve" width="512px" height="512px">
+                            <g id="Pause">
+                                <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M80.543,0H35.797c-9.885,0-17.898,8.014-17.898,17.898v196.883   c0,9.885,8.013,17.898,17.898,17.898h44.746c9.885,0,17.898-8.013,17.898-17.898V17.898C98.44,8.014,90.427,0,80.543,0z M196.882,0   h-44.746c-9.886,0-17.899,8.014-17.899,17.898v196.883c0,9.885,8.013,17.898,17.899,17.898h44.746   c9.885,0,17.898-8.013,17.898-17.898V17.898C214.781,8.014,206.767,0,196.882,0z" fill="#FFFFFF"/>
+                            </g>
+                        </svg>
+                    </div>
 
-                <div  id="break_svg" onclick="breakLoad()" title="Cancel upload">
-                    <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 212.982 212.982" style="enable-background:new 0 0 212.982 212.982;" xml:space="preserve" width="512px" height="512px">
-                        <g id="Close">
-                            <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M131.804,106.491l75.936-75.936c6.99-6.99,6.99-18.323,0-25.312   c-6.99-6.99-18.322-6.99-25.312,0l-75.937,75.937L30.554,5.242c-6.99-6.99-18.322-6.99-25.312,0c-6.989,6.99-6.989,18.323,0,25.312   l75.937,75.936L5.242,182.427c-6.989,6.99-6.989,18.323,0,25.312c6.99,6.99,18.322,6.99,25.312,0l75.937-75.937l75.937,75.937   c6.989,6.99,18.322,6.99,25.312,0c6.99-6.99,6.99-18.322,0-25.312L131.804,106.491z" fill="#FFFFFF"/>
-                        </g>
-                    </svg>
-                </div>
-                  <div class="log" id="log"></div>      
-                </div>
+                    <div  id="break_svg" onclick="breakLoad()" title="Cancel upload">
+                        <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 212.982 212.982" style="enable-background:new 0 0 212.982 212.982;" xml:space="preserve" width="512px" height="512px">
+                            <g id="Close">
+                                <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M131.804,106.491l75.936-75.936c6.99-6.99,6.99-18.323,0-25.312   c-6.99-6.99-18.322-6.99-25.312,0l-75.937,75.937L30.554,5.242c-6.99-6.99-18.322-6.99-25.312,0c-6.989,6.99-6.989,18.323,0,25.312   l75.937,75.936L5.242,182.427c-6.989,6.99-6.989,18.323,0,25.312c6.99,6.99,18.322,6.99,25.312,0l75.937-75.937l75.937,75.937   c6.989,6.99,18.322,6.99,25.312,0c6.99-6.99,6.99-18.322,0-25.312L131.804,106.491z" fill="#FFFFFF"/>
+                            </g>
+                        </svg>
+                    </div>
+            <div class="log" id="log"></div>      
+                    </div>
             <!-- <input id="files" type="file" webkitdirectory directory multiple/> -->
             <script>
                 document.getElementById('choose').addEventListener("click", chooseFunc);
+                document.getElementById("reload_ips").addEventListener("click", reloadConnectedIPs)
                 // document.getElementById('begin_svg').addEventListener('click', start)
+                
+                progress(80)
+              
                 window.external.invoke('myIP')
 
                 window.transData = {path: "none"};
                 var last_fin = 0;
+                
+                function reloadConnectedIPs(){
+                    window.external.invoke('getConnectedIPs')    
+                }
+
+                function redrawIPs(ips){
+                    let selector = document.getElementById('select_ip')
+                    selector.innerHTML = ""
+                    let newEl;
+                    ips.forEach(function(element){
+                        newEl = document.createElement('option')
+                        newEl.value = element
+                        newEl.innerText = element
+                        selector.appendChild(newEl)
+                    });
+                }
+
                 function startLoad(){
                     console.log("Hello")
                     if(window.transData.path=="none"){
@@ -241,6 +321,7 @@
                         document.getElementById("break_svg").style.display = 'inline-block'
                     }
                 }
+                
                 function stopLoad(){
                     document.getElementById("stop_svg").style.display = 'none'
                     document.getElementById("begin_svg").style.display = 'inline-block'
@@ -252,7 +333,6 @@
                     document.getElementById("break_svg").style.display = 'none'
                     document.getElementById("begin_svg").style.display = 'inline-block'
                 }
-                
 
                 function sleep (time, resolve) {
                     (function (resolve) {
@@ -267,13 +347,13 @@
                     if(fin>180){
                         document.getElementById("circle_left").style.transform = "rotate(180deg)"
                         document.getElementById("circle_right").style.transform = "rotate("+fin+"deg)"
+                        document.getElementById("wrapper").style.clip="rect(auto,auto,auto,auto)" 
                         
                         // bug with transitions
-                        if(last_fin<=180){
-                            sleep(300, function(){
-                                document.getElementById("wrapper").style.clip="rect(auto,auto,auto,auto)" 
-                            });
-                        }
+                        // if(last_fin<=180){
+                        //     sleep(300, function(){
+                        //     });
+                        // }
                         last_fin = fin;
                         
                     }else{
@@ -282,7 +362,7 @@
                         document.getElementById("circle_right").style.transform = "rotate(0deg)"
                         last_fin = fin;
                     }
-                    document.getElementById('progress_pointer').innerHTML = event.target.value+"%"
+                    document.getElementById('progress_pointer').innerHTML = val+"%"
                 }
 
                 function setMyIP(ip){

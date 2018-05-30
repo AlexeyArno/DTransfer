@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/gui"
 	"github.com/AlexeyArno/golang-files-transfer/src/network"
@@ -13,14 +12,6 @@ import (
 )
 
 var close = make(chan struct{})
-var serverStart = make(chan struct{})
-
-func sayHello(w http.ResponseWriter, r *http.Request) {
-	message := r.URL.Path
-	message = strings.TrimPrefix(message, "/")
-	message = "Hello " + message
-	w.Write([]byte(message))
-}
 
 func main() {
 	data, err := gui.Asset("data/index.html")
@@ -41,11 +32,11 @@ func main() {
 	log.Println("Listen TCP port: ", port)
 	webSocketWork.RegisterTCPPort(port)
 
-	go func(port string, serverStart chan struct{}) {
+	go func(port string) {
 		if err := http.ListenAndServe(":"+port, nil); err != nil {
 			panic(err)
 		}
-	}(port, serverStart)
+	}(port)
 
 	// close <- struct{}{}
 	network.StartServer()
@@ -57,7 +48,7 @@ func main() {
 		ExternalInvokeCallback: gui.HandleRPC})
 	gui.RegisterGUI(&w)
 	defer w.Exit()
-	w.Run()
+	// w.Run()
 	<-close
 
 }
