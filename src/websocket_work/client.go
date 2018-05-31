@@ -1,4 +1,4 @@
-package webSocketWork
+package websocket_work
 
 import (
 	"log"
@@ -21,10 +21,18 @@ func ConnectTo(reciverIP string) {
 	origin := "http://" + reciverIP + "/"
 	urlData := "ws://" + reciverIP + "/websocket_data"
 
-	dataConn, err := websocket.Dial(urlData, "", origin)
+	connConfig, err := websocket.NewConfig(urlData, origin)
+	if err != nil {
+		log.Println("Connect to 1 : ", err)
+		return
+	}
+	connConfig.Header.Add("Requester-IP", myIP+":"+tcpPort)
+
+	dataConn, err := websocket.DialConfig(connConfig)
 	if err != nil {
 		// log.Println("WebSocket Client 1: ", err)
 	} else {
+		// dataConn.Config().Header.Add("Requester-IP", myIP+":"+tcpPort)
 		log.Println("Connected to ", dataConn.Config().Origin.Host)
 		enteringData <- dataConn
 		go listenDataChannel(dataConn, 0)

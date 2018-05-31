@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
-	webSocketWork "github.com/AlexeyArno/golang-files-transfer/src/webSocketWork"
+	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 )
 
 var (
@@ -59,7 +59,7 @@ func gotUsefullIP(ip string, myport string) {
 	IPFound(ip)
 	for _, port := range AvailabalePortsTCP {
 		if port != myport {
-			go webSocketWork.ConnectTo(ip + ":" + port)
+			go websocket_work.ConnectTo(ip + ":" + port)
 		}
 	}
 }

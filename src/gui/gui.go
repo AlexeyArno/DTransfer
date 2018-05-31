@@ -1,6 +1,10 @@
 package gui
 
 import (
+	"encoding/json"
+	"log"
+	"strings"
+
 	gui_js_api "github.com/AlexeyArno/golang-files-transfer/src/gui_js_api"
 	webview "github.com/zserge/webview"
 )
@@ -17,5 +21,16 @@ func HandleRPC(w webview.WebView, data string) {
 		gui_js_api.UpdateIP(&w)
 	case data == "getConnectedIPs":
 		gui_js_api.GetConnectedIPs(&w)
+	case strings.HasPrefix(data, "startLoad:"):
+		data := strings.TrimPrefix(data, "startLoad:")
+		log.Println(data)
+		var dat map[string]string
+
+		if err := json.Unmarshal([]byte(data), &dat); err != nil {
+			log.Println("Handle RPC: ", err)
+			return
+		}
+
+		go startLoad(dat)
 	}
 }

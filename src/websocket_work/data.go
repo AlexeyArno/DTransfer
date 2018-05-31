@@ -1,4 +1,4 @@
-package webSocketWork
+package websocket_work
 
 import "golang.org/x/net/websocket"
 

@@ -35,9 +35,3 @@ func ScanNetwork() {
 func IPFound(ip string) {
 	log.Println("Ip Found: ", ip)
 }
-
-//StartServer start server
-func StartServer() string {
-	// go StartScanNetworks(printFound)
-	return "192.0.0.0"
-}

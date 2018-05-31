@@ -4,9 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	data_handler "github.com/AlexeyArno/golang-files-transfer/src/data_handler"
 	"github.com/AlexeyArno/golang-files-transfer/src/gui"
 	"github.com/AlexeyArno/golang-files-transfer/src/network"
-	webSocketWork "github.com/AlexeyArno/golang-files-transfer/src/webSocketWork"
+	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 	"github.com/zserge/webview"
 	"golang.org/x/net/websocket"
 )
@@ -22,14 +23,15 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(data)
 	})
-	http.Handle("/websocket_data", websocket.Handler(webSocketWork.DataHandler))
+	http.HandleFunc("/info", data_handler.InfoHandler)
+	http.Handle("/websocket_data", websocket.Handler(websocket_work.DataHandler))
 
 	port, err := network.ReservTCPPort()
 	if err != nil {
 		panic(err)
 	}
 	log.Println("Listen TCP port: ", port)
-	webSocketWork.RegisterTCPPort(port)
+	websocket_work.RegisterTCPPort(port)
 
 	go func(port string) {
 		if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -38,7 +40,7 @@ func main() {
 	}(port)
 
 	// close <- struct{}{}
-	network.StartServer()
+	// network.StartServer()
 	w := webview.New(webview.Settings{
 		Title:                  "DTransfer",
 		URL:                    "http://127.0.0.1:" + port,

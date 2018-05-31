@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
-	"github.com/AlexeyArno/golang-files-transfer/src/webSocketWork"
+	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 	webview "github.com/zserge/webview"
 )
 
@@ -28,7 +28,7 @@ func UpdateIP(w *webview.WebView) {
 }
 
 func GetConnectedIPs(w *webview.WebView) {
-	IPs := webSocketWork.GetConnectedIPs()
+	IPs := websocket_work.GetConnectedIPs()
 	log.Println(IPs)
 	s := fmt.Sprintf(`redrawIPs(["%s"])`, strings.Join(IPs, ","))
 

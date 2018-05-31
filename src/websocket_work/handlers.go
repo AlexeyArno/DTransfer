@@ -1,15 +1,15 @@
-package webSocketWork
+package websocket_work
 
 import (
 	"log"
 	"sync"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/utility"
 	"golang.org/x/net/websocket"
 )
 
 var (
 	machines       []*machine
-	enteringInfo   = make(chan *websocket.Conn)
 	enteringData   = make(chan *websocket.Conn)
 	leaving        = make(chan *websocket.Conn)
 	machinesLocker = &sync.Mutex{}
@@ -21,13 +21,18 @@ func init() {
 
 func DataHandler(ws *websocket.Conn) {
 
-	log.Println("Client origin: ", ws.Config().Origin.Host, "conn to data-channel location ", ws.Config().Location.Host)
+	log.Println("Client origin: ", ws.Request().RemoteAddr, "conn to data-channel")
 	enteringData <- ws
 	listenDataChannel(ws, 1)
 }
 
 // WebsocketService process all new and old websocket connections
 func WebsocketService() {
+	ip, err := utility.MyIP()
+	if err != nil {
+		return
+	}
+
 	for {
 		select {
 
@@ -39,12 +44,14 @@ func WebsocketService() {
 			m := machineIsHere(c)
 			if m != nil {
 				(*m).dataConn = c
-				(*m).IP = c.Config().Origin.Host
 				// log.Println("Data channel connected")
 			} else {
 				machinesLocker.Lock()
 				nMachine := machine{dataConn: c}
 				nMachine.IP = c.Config().Origin.Host
+				if nMachine.IP == ip+":"+tcpPort {
+					nMachine.IP = c.Request().Header.Get("Requester-Ip")
+				}
 
 				machines = append(machines, &nMachine)
 				// log.Println("Data channel connected")

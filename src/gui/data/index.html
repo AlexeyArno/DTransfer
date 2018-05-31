@@ -241,6 +241,7 @@
                 <div class="form_select">
                     <span>Send to: </span>       
                     <select id="select_ip">
+                         <option value="192.168.0.2">192.168.0.1</option>
                     </select>
                     <div id="reload_ips">
                         <svg class="button_icon" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 28.265 28.265" style="enable-background:new 0 0 28.265 28.265;" xml:space="preserve" width="512px" height="512px">
@@ -290,7 +291,7 @@
               
                 window.external.invoke('myIP')
 
-                window.transData = {path: "none"};
+                window.transData = {path: "d:/129/788"};
                 var last_fin = 0;
                 
                 function reloadConnectedIPs(){
@@ -310,14 +311,17 @@
                 }
 
                 function startLoad(){
-                    console.log("Hello")
+                    var ip = document.getElementById("select_ip").value;
                     if(window.transData.path=="none"){
                         document.getElementById("alert").innerHTML="Choose directory!!!"
+                    }else if(!ip){
+                        document.getElementById("alert").innerHTML="Choose IP!!!"
                     }else{
                         document.getElementById("alert").innerHTML=""
                         document.getElementById("begin_svg").style.display = 'none'
                         document.getElementById("stop_svg").style.display = 'inline-block'
                         document.getElementById("break_svg").style.display = 'inline-block'
+                        window.external.invoke('startLoad:{"path": "'+window.transData.path+'", "ip": "'+ip +'"}')
                     }
                 }
                 
