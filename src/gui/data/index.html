@@ -32,6 +32,7 @@
                     padding-top: 10px;
                     color:#e0e0e0;
                     cursor:default;
+                    overflow: hidden;
                     -webkit-touch-callout: none; /* iOS Safari */
                     -webkit-user-select: none; /* Safari */
                     -khtml-user-select: none; /* Konqueror HTML */
@@ -212,6 +213,53 @@
                     width:20px;
                     height: 20px;
                 }
+
+                #offer{
+                    width: 315px;
+                    height: 50px;
+                    background: rgba(0,0,0,0.3);
+                    text-align: left;
+                    padding-left: 5px;
+                    position: relative;
+                    left: -10px;
+                    top:50px;
+                    transition: top 0.1s ease-in-out;
+                }
+                #offer_body{
+                    display: inline-block;
+                    width: 70%;
+                    height: 40px;
+                    margin-top: 15px;
+                }
+                .offer_button{
+                    display: inline-block;
+                    position: relative;
+                    width: 35px;
+                    margin-right: 5px;
+                    border: 1px solid rgba(255,255,255,0.5);
+                    border-radius: 3px;
+                    text-align: center;
+                    opacity: 1;
+                    position: relative;
+                    left: -5px;
+                }
+                .offer_button:hover{
+                    box-shadow: 0px 0px 15px 0px rgba(0,0,0,0.75);
+                }
+                #offer_yes{
+                   background: rgba(248, 172, 31,0.7)
+                }
+                #offer_no{
+                   
+                }
+
+                .offer_buttons{
+                    display: inline-block;
+                    height: 40px;
+                    float: right;
+                    margin-top: 15px;
+                }
+                
                 </style>
     </head>
     <body>
@@ -280,9 +328,89 @@
                         </svg>
                     </div>
             <div class="log" id="log"></div>      
+                </div>
+                <div id="offer">
+                    <div id="offer_body">
+                        192.168.255.255:123456 - offer transit directory "ass"
                     </div>
+                    <div class="offer_buttons">
+                        <div id="offer_yes" class="offer_button">
+                            Yes
+                        </div>
+                        <div id="offer_no" class="offer_button">
+                            No
+                        </div>
+                    </div>
+                    </div>
+                    
+                </div>
             <!-- <input id="files" type="file" webkitdirectory directory multiple/> -->
+            <script>    
+
+                var offer = document.getElementById("offer")
+                var offer_body = document.getElementById("offer_body")
+                var offer_yes = document.getElementById("offer_yes")
+                var offer_no = document.getElementById("offer_no")
+                
+
+                offer_yes.addEventListener('click', function(){
+                    window.external.invoke('acceptTransitOffer:'+offersSequence[offersSequence.length - 1].IP);
+                    next();
+                })
+                
+                offer_no.addEventListener('click', function(){
+                    window.external.invoke('cancelTransitOffer:'+offersSequence[offersSequence.length - 1].IP);
+                    next();
+                })
+
+                var offersSequence = []
+                var subscribers = []
+
+                function subscribeToOffers(func){
+                    subscribers.push(func)
+                }
+
+                function unsubscribe(func){
+                    // subscribers.pop(subscribers.indexOf(func))
+                    subscribers.splice(subscribers.indexOf(func), 1);
+                }
+
+                function offersPush(offer){
+
+                    offersSequence.push(offer)
+                    if(offersSequence.length == 1){
+                        subscribers.forEach(function(func){
+                            func(offersSequence[0])
+                        })
+                    }
+                   
+                }
+
+                function next(){
+                    offer.style.top = '50px'
+
+                    if(offersSequence.length==0){return}
+                    offersSequence.splice(0, 1);
+                    if(offersSequence.length > 0){
+                        subscribers.forEach(function(func){
+                            func(offersSequence[0])
+                        })
+                    }
+                }
+
+                subscribeToOffers(function(lastOffer){
+                    offer_body.innerHTML = lastOffer.text
+                    offer.style.top = '0px'
+                    
+                })
+
+            </script>
             <script>
+               
+
+
+
+
                 document.getElementById('choose').addEventListener("click", chooseFunc);
                 document.getElementById("reload_ips").addEventListener("click", reloadConnectedIPs)
                 // document.getElementById('begin_svg').addEventListener('click', start)
@@ -351,12 +479,6 @@
                         document.getElementById("circle_left").style.transform = "rotate(180deg)"
                         document.getElementById("circle_right").style.transform = "rotate("+fin+"deg)"
                         document.getElementById("wrapper").style.clip="rect(auto,auto,auto,auto)" 
-                        
-                        // bug with transitions
-                        // if(last_fin<=180){
-                        //     sleep(300, function(){
-                        //     });
-                        // }
                         last_fin = fin;
                         
                     }else{

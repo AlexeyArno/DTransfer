@@ -45,7 +45,7 @@ func main() {
 		Title:                  "DTransfer",
 		URL:                    "http://127.0.0.1:" + port,
 		Width:                  300,
-		Height:                 430,
+		Height:                 420,
 		ExternalInvokeCallback: gui.HandleRPC})
 	gui.RegisterGUI(&w)
 	defer w.Exit()

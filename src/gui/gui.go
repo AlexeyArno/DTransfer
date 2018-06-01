@@ -21,6 +21,12 @@ func HandleRPC(w webview.WebView, data string) {
 		gui_js_api.UpdateIP(&w)
 	case data == "getConnectedIPs":
 		gui_js_api.GetConnectedIPs(&w)
+	case strings.HasPrefix(data, "acceptTransitOffer:"):
+		IP := strings.TrimPrefix(data, "acceptTransitOffer:")
+		log.Println("Accept Transfer: ", IP)
+	case strings.HasPrefix(data, "cancelTransitOffer:"):
+		IP := strings.TrimPrefix(data, "cancelTransitOffer:")
+		log.Println("Cancel Transfer: ", IP)
 	case strings.HasPrefix(data, "startLoad:"):
 		data := strings.TrimPrefix(data, "startLoad:")
 		log.Println(data)

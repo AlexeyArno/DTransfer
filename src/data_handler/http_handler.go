@@ -10,18 +10,6 @@ import (
 func parseCommand(req *http.Request) (map[string]interface{}, error) {
 	var nCommand map[string]interface{}
 
-	// switch req.Header.Get("Command-Type") {
-	// case "Offer":
-	// 	nCommand = command{}
-	// 	break
-	// case "NewDirectory":
-	// 	nCommand = newDirectory{}
-	// 	break
-	// case "NewFile":
-	// 	nCommand = newFile{}
-	// 	break
-	// }
-
 	b, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return nCommand, err

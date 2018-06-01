@@ -1,6 +1,8 @@
 package gui
 
 import (
+	"fmt"
+
 	webview "github.com/zserge/webview"
 )
 
@@ -22,9 +24,11 @@ func Offer(dirName string, IP string) {
 		return
 	}
 	(*currentWindow).Dispatch(func() {
-		(*currentWindow).Dialog(
-			webview.DialogTypeAlert, 0,
-			IP+" offer transwer direcotory - "+dirName+" to you", "Ok")
+		s := fmt.Sprintf(`offersPush({'text':"%s", 'IP':"%s"})`,
+			IP+" offer transfer directory - '"+dirName+"'",
+			IP)
+
+		(*currentWindow).Eval(s)
 	})
 
 }
