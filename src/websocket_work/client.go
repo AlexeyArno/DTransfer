@@ -3,6 +3,8 @@ package websocket_work
 import (
 	"log"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
+
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
 	"golang.org/x/net/websocket"
 )
@@ -14,7 +16,7 @@ func ConnectTo(reciverIP string) {
 		log.Println("Panic myIP webSocketWork", err)
 		panic(err)
 	}
-	if reciverIP == myIP+":"+tcpPort {
+	if reciverIP == myIP+":"+network_data_handler.TCPPort {
 		// log.Println("Reciever IP equal my IP")
 		return
 	}
@@ -26,7 +28,7 @@ func ConnectTo(reciverIP string) {
 		log.Println("Connect to 1 : ", err)
 		return
 	}
-	connConfig.Header.Add("Requester-IP", myIP+":"+tcpPort)
+	connConfig.Header.Add("Requester-IP", myIP+":"+network_data_handler.TCPPort)
 
 	dataConn, err := websocket.DialConfig(connConfig)
 	if err != nil {

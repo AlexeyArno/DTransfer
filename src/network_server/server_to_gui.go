@@ -1,7 +1,7 @@
-package data_handler
+package network_server
 
 import gui "github.com/AlexeyArno/golang-files-transfer/src/gui"
 
 func offer(c map[string]interface{}, IP string) {
-	gui.Offer(c["data"].(string), IP)
+	gui.GetOffer(c["data"].(string), IP)
 }

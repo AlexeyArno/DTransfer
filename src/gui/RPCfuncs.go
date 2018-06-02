@@ -1,12 +1,12 @@
 package gui
 
 import (
-	"bytes"
-	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/AlexeyArno/golang-files-transfer/src/network_client"
 )
 
 var tr = &http.Transport{
@@ -16,7 +16,7 @@ var tr = &http.Transport{
 }
 
 // startLoad: data = {"path": ..., "ip": 192...}
-func startLoad(data map[string]string) {
+func sendOffer(data map[string]string) {
 	var Path, IP string
 	if path, ok := data["path"]; ok {
 		Path = path
@@ -33,28 +33,24 @@ func startLoad(data map[string]string) {
 	splitPath := strings.Split(Path, "/")
 	directoryName := splitPath[len(splitPath)-1]
 
-	client := &http.Client{
-		Transport: tr,
-	}
-
-	by := new(bytes.Buffer)
-	dataFinal := map[string]string{"data": directoryName}
-	json.NewEncoder(by).Encode(dataFinal)
-
-	req, err := http.NewRequest("POST", "http://"+IP+"/info", by)
+	err := network_client.SendOffer(directoryName, IP)
 	if err != nil {
-		log.Println("startLoad 3: ", err)
-		return
+		log.Println("sendOffer gui: ", err)
 	}
-	req.Header.Add("Command-Type", "Offer")
 
-	resp, err := client.Do(req)
+}
+
+func sendAcceptOffer(IP string) {
+	err := network_client.SendAcceptOffer(IP)
 	if err != nil {
-		log.Println("startLoad 4: ", err)
-		return
+		log.Println("sendAcceptOffer gui: ", err)
 	}
-	log.Println(resp.Body)
 
-	// log.Println(Path, IP, directoryName)
+}
 
+func sendCancelOffer(IP string) {
+	err := network_client.SendCancelOffer(IP)
+	if err != nil {
+		log.Println("sendCancelOffer gui: ", err)
+	}
 }

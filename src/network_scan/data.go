@@ -1,4 +1,4 @@
-package network
+package network_scan
 
 var AvailabalePortsUDP []string = []string{"1002", "1003", "1004", "1234", "1432"}
 

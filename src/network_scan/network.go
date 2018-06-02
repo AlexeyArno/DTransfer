@@ -1,4 +1,4 @@
-package network
+package network_scan
 
 import (
 	"errors"

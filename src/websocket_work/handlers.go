@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
 	"golang.org/x/net/websocket"
 )
@@ -49,7 +50,7 @@ func WebsocketService() {
 				machinesLocker.Lock()
 				nMachine := machine{dataConn: c}
 				nMachine.IP = c.Config().Origin.Host
-				if nMachine.IP == ip+":"+tcpPort {
+				if nMachine.IP == ip+":"+network_data_handler.TCPPort {
 					nMachine.IP = c.Request().Header.Get("Requester-Ip")
 				}
 

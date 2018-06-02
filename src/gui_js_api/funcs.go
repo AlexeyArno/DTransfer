@@ -10,11 +10,13 @@ import (
 	webview "github.com/zserge/webview"
 )
 
-func OpenDir(w *webview.WebView) {
+func OpenDir(w *webview.WebView) string {
 	answer := (*w).Dialog(webview.DialogTypeOpen, webview.DialogFlagDirectory, "Open directory", "")
 	answer = strings.Replace(answer, `\`, "/", -1)
+	// network_data_handler.UploadPath = answer
 	s := fmt.Sprintf(`transData = {path: "%s"}`, answer)
 	(*w).Eval(s)
+	return answer
 }
 
 func UpdateIP(w *webview.WebView) {

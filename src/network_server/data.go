@@ -1,9 +1,10 @@
-package data_handler
+package network_server
 
 var (
-	upload          bool
-	download        bool
-	currentFilePath string
+	upload            bool
+	download          bool
+	currentFilePath   string
+	currentIPReciever string
 )
 
 type command struct {

@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
     <head>
+            <meta http-equiv="X-UA-Compatible" content="IE=9;IE=10;IE=Edge,chrome=1"/>
             <style>
                 .wrapper {
                     width: 170px; /* Set the size of the progress bar */
@@ -150,11 +151,13 @@
                 }
                 #begin_svg,
                 #stop_svg,
-                #break_svg{
+                #break_svg,
+                #loader{
                     display: inline-block;
                     width: 50px;
                     height: 50px;
                     margin:auto;
+                    /* transform: rotate(33deg);  */
                 }
                 .image_button{
                     width: 50px;
@@ -162,9 +165,18 @@
 
                 }
                 #stop_svg,
+                #loader,
                 #break_svg{
                     display: none;
                 }
+                #loader{
+                    transform: rotate(20deg); 
+                }
+                #circleLoader,
+                #circleLoader2{
+                    transform: rotate(0deg); 
+                }
+               
                 .active_button{
                     transition: all 0.1s ease-in-out;
                     cursor: pointer;
@@ -220,9 +232,9 @@
                     background: rgba(0,0,0,0.3);
                     text-align: left;
                     padding-left: 5px;
-                    position: relative;
-                    left: -10px;
-                    top:50px;
+                    position: absolute;
+                    left: 0px;
+                    top:430px;
                     transition: top 0.1s ease-in-out;
                 }
                 #offer_body{
@@ -305,7 +317,7 @@
                 <div id="alert"></div>
                 </div>
                 <div  id="begin">
-                    <div id="begin_svg" onclick="startLoad()" title="Start or continue">
+                    <div id="begin_svg" onclick="offerLoad()" title="Start or continue">
                         <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.153 232.153" style="enable-background:new 0 0 232.153 232.153;" xml:space="preserve" width="512px" height="512px">
                             <g id="Play">
                                 <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M203.791,99.628L49.307,2.294c-4.567-2.719-10.238-2.266-14.521-2.266   c-17.132,0-17.056,13.227-17.056,16.578v198.94c0,2.833-0.075,16.579,17.056,16.579c4.283,0,9.955,0.451,14.521-2.267   l154.483-97.333c12.68-7.545,10.489-16.449,10.489-16.449S216.471,107.172,203.791,99.628z" fill="#FFFFFF"/>
@@ -327,8 +339,21 @@
                             </g>
                         </svg>
                     </div>
+
+                    <div id="loader">
+                            <svg viewBox="0 0 50 45"  id="circleLoader" -ms-transform-origin="25px 22px">
+                                    <g>
+                                      <circle   cx="25" cy="22.5" r="20" -ms-transform-origin="25px 22px"
+                                      style="fill:rgba(0,0,0,0);stroke: #88C057; stroke-width: 2; stroke-dasharray: 10, 5;" />
+                                      <circle  cx="25" cy="22.5" r="8" -ms-transform-origin="25px 22px" 
+                                      style="fill:rgba(0,0,0,0);stroke: #88C057; stroke-width: 2; stroke-dasharray: 10, 5;" />
+                                
+                                    </g>
+                                  </svg>
+                    </div>
             <div class="log" id="log"></div>      
                 </div>
+                
                 <div id="offer">
                     <div id="offer_body">
                         192.168.255.255:123456 - offer transit directory "ass"
@@ -344,7 +369,107 @@
                     </div>
                     
                 </div>
-            <!-- <input id="files" type="file" webkitdirectory directory multiple/> -->
+            <script>
+                window.transData = {path: "d:/129/788"};
+            </script>
+
+            <script>
+            "use strict";
+
+            /* CONSTANTS */
+            var initialTheta = 0; // The initial rotation angle, in degrees.
+            var thetaDelta = 4; // The amount to rotate the square about every 16.7 milliseconds, in degrees.
+            var angularLimit = 90; // The maximum number of degrees to rotate the square.
+            var circleLoader = document.getElementById("circleLoader");
+            var circleLoader2 = document.getElementById("circleLoader2");
+
+            var now  = initialTheta
+            function doAnim() {
+                if(now>=360){
+                    now = 0
+                }
+
+                circleLoader.style['-ms-transform'] = "rotate(" + now + "deg)"
+                 now += thetaDelta; 
+                 sleep(10, doAnim)
+            }
+
+            doAnim()
+
+            function sleep (time, resolve) {
+                    (function (resolve) {
+                        setTimeout(function () { 
+                            resolve();
+                        },time)
+                    })(resolve)
+                }  
+
+
+            var requestAnimationFrameID 
+            function StartLoaderAnimation(){
+                // requestAnimationFrameID = requestAnimationFrame(doAnim)
+            }
+
+            function StopLoaderAnimation(){
+                // cancelAnimationFrame(requestAnimationFrameID)
+            }
+
+            circleLoader.currentTheta = initialTheta; // The initial rotation angle to use when the animation starts, stored in a custom property.
+
+         
+        </script>
+            <!-- Loaders script -->
+            <script>
+                var alertEl = document.getElementById("alert")
+                var beginEl = document.getElementById("begin_svg")
+                var stopEl = document.getElementById("stop_svg")
+                var breakEl = document.getElementById("break_svg")
+                var loaderEl = document.getElementById("loader")
+
+
+                function offerLoad(){
+                    var ip = document.getElementById("select_ip").value;
+                    if(window.transData.path=="none"){
+                        alertEl.innerHTML="Choose directory!!!"
+                    }else if(!ip){
+                        alertEl.innerHTML="Choose IP!!!"
+                    }else{
+                        alertEl.innerHTML=""
+                        beginEl.style.display = 'none'
+                        StartLoaderAnimation()
+                        loaderEl.style.display = "inline-block"
+                        
+                        window.external.invoke('startLoad:{"path": "'+window.transData.path+'", "ip": "'+ip +'"}')
+                    }
+                }
+
+                function stopLoad(){
+                    stopEl.style.display = 'none'
+                    beginEl.style.display = 'inline-block'
+
+                }
+
+                function breakLoad(){
+                    stopEl.style.display = 'none'
+                    breakEl.style.display = 'none'
+                    beginEl.style.display = 'inline-block'
+                }
+
+                function offerAccepted(){
+                    StopLoaderAnimation()
+                    loaderEl.style.display = "none"
+                    stopEl.style.display = 'inline-block'
+                    breakEl.style.display = 'inline-block'
+                }
+
+                function offerCanceled(reason){
+                    alertEl.innerHTML = reason
+                    loaderEl.style.display = "none"
+                    beginEl.style.display = 'inline-block'
+                }
+
+            </script>
+            <!-- New Transit Offers -->
             <script>    
 
                 var offer = document.getElementById("offer")
@@ -379,6 +504,7 @@
 
                     offersSequence.push(offer)
                     if(offersSequence.length == 1){
+                        window.external.invoke('dialoginfo:New transit offer')
                         subscribers.forEach(function(func){
                             func(offersSequence[0])
                         })
@@ -387,7 +513,7 @@
                 }
 
                 function next(){
-                    offer.style.top = '50px'
+                    offer.style.top = '430px'
 
                     if(offersSequence.length==0){return}
                     offersSequence.splice(0, 1);
@@ -400,7 +526,7 @@
 
                 subscribeToOffers(function(lastOffer){
                     offer_body.innerHTML = lastOffer.text
-                    offer.style.top = '0px'
+                    offer.style.top = '380px'
                     
                 })
 
@@ -416,10 +542,11 @@
                 // document.getElementById('begin_svg').addEventListener('click', start)
                 
                 progress(80)
+                // doAnim()
               
                 window.external.invoke('myIP')
 
-                window.transData = {path: "d:/129/788"};
+                
                 var last_fin = 0;
                 
                 function reloadConnectedIPs(){
@@ -438,41 +565,12 @@
                     });
                 }
 
-                function startLoad(){
-                    var ip = document.getElementById("select_ip").value;
-                    if(window.transData.path=="none"){
-                        document.getElementById("alert").innerHTML="Choose directory!!!"
-                    }else if(!ip){
-                        document.getElementById("alert").innerHTML="Choose IP!!!"
-                    }else{
-                        document.getElementById("alert").innerHTML=""
-                        document.getElementById("begin_svg").style.display = 'none'
-                        document.getElementById("stop_svg").style.display = 'inline-block'
-                        document.getElementById("break_svg").style.display = 'inline-block'
-                        window.external.invoke('startLoad:{"path": "'+window.transData.path+'", "ip": "'+ip +'"}')
-                    }
-                }
+              
+             
+
+               
+
                 
-                function stopLoad(){
-                    document.getElementById("stop_svg").style.display = 'none'
-                    document.getElementById("begin_svg").style.display = 'inline-block'
-
-                }
-
-                function breakLoad(){
-                    document.getElementById("stop_svg").style.display = 'none'
-                    document.getElementById("break_svg").style.display = 'none'
-                    document.getElementById("begin_svg").style.display = 'inline-block'
-                }
-
-                function sleep (time, resolve) {
-                    (function (resolve) {
-                        setTimeout(function () { 
-                            resolve();
-                        },time)
-                    })(resolve)
-                }  
-
                 function progress(val){
                     var fin = 3.6* val
                     if(fin>180){

@@ -19,10 +19,22 @@ func RegisterGUI(window *webview.WebView) {
 // 	})
 // }
 
-func Offer(dirName string, IP string) {
+func DialogInfo(body string) {
 	if currentWindow == nil {
 		return
 	}
+
+	(*currentWindow).Dispatch(func() {
+		(*currentWindow).Dialog(webview.DialogTypeAlert, webview.DialogFlagInfo,
+			"DTransfer", body)
+	})
+}
+
+func GetOffer(dirName string, IP string) {
+	if currentWindow == nil {
+		return
+	}
+
 	(*currentWindow).Dispatch(func() {
 		s := fmt.Sprintf(`offersPush({'text':"%s", 'IP':"%s"})`,
 			IP+" offer transfer directory - '"+dirName+"'",
@@ -31,4 +43,24 @@ func Offer(dirName string, IP string) {
 		(*currentWindow).Eval(s)
 	})
 
+}
+
+func ShippedOfferAccepted() {
+	if currentWindow == nil {
+		return
+	}
+	(*currentWindow).Dispatch(func() {
+		s := fmt.Sprintf(`offerAccepted()`)
+		(*currentWindow).Eval(s)
+	})
+}
+
+func ShippedOfferCanceled(reason string) {
+	if currentWindow == nil {
+		return
+	}
+	(*currentWindow).Dispatch(func() {
+		s := fmt.Sprintf(`offerCanceled("%s")`, reason)
+		(*currentWindow).Eval(s)
+	})
 }
