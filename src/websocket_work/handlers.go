@@ -2,7 +2,6 @@ package websocket_work
 
 import (
 	"log"
-	"sync"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
@@ -10,10 +9,8 @@ import (
 )
 
 var (
-	machines       []*machine
-	enteringData   = make(chan *websocket.Conn)
-	leaving        = make(chan *websocket.Conn)
-	machinesLocker = &sync.Mutex{}
+	enteringData = make(chan *websocket.Conn)
+	leaving      = make(chan *websocket.Conn)
 )
 
 func init() {
@@ -29,11 +26,10 @@ func DataHandler(ws *websocket.Conn) {
 
 // WebsocketService process all new and old websocket connections
 func WebsocketService() {
-	ip, err := utility.MyIP()
+	myIP, err := utility.MyIP()
 	if err != nil {
 		return
 	}
-
 	for {
 		select {
 
@@ -42,58 +38,25 @@ func WebsocketService() {
 				log.Println("Data channel faile")
 				return
 			}
-			m := machineIsHere(c)
-			if m != nil {
-				(*m).dataConn = c
-				// log.Println("Data channel connected")
-			} else {
-				machinesLocker.Lock()
-				nMachine := machine{dataConn: c}
-				nMachine.IP = c.Config().Origin.Host
-				if nMachine.IP == ip+":"+network_data_handler.TCPPort {
-					nMachine.IP = c.Request().Header.Get("Requester-Ip")
-				}
-
-				machines = append(machines, &nMachine)
-				// log.Println("Data channel connected")
-				machinesLocker.Unlock()
+			if network_data_handler.MachineIsHere(c) {
+				log.Println("Websocket Work 1:", "machine already exist")
+				c.Close()
+				continue
 			}
+			ip := c.Config().Origin.Host
+			if ip == myIP+":"+network_data_handler.TCPPort {
+				ip = c.Request().Header.Get("Partner-Ip")
+			}
+			if ip == "" {
+				log.Println("Websocket Work 2:", "ip is empty")
+				c.Close()
+				continue
+			}
+			network_data_handler.AddMachine(ip, c)
 		case c := <-leaving:
-			m := machineIsHere(c)
-			if m != nil {
-				log.Println(m)
-				if (*m).dataConn != nil {
-					(*m).dataConn.Close()
-				}
-				deleteMachine(m)
-				m = nil
-				log.Println("Machine deleted")
+			if network_data_handler.MachineIsHere(c) {
+				network_data_handler.DeleteMachine(c)
 			}
 		}
 	}
-}
-
-func machineIsHere(w *websocket.Conn) *machine {
-	machinesLocker.Lock()
-	defer machinesLocker.Unlock()
-	for _, m := range machines {
-		if (*m).IP == w.Config().Origin.Host {
-			return m
-		}
-	}
-	return nil
-}
-
-func deleteMachine(m *machine) {
-	machinesLocker.Lock()
-	for i, machine := range machines {
-		if (*machine).IP == (*m).IP {
-			machines[i] = machines[len(machines)-1]
-			machines[len(machines)-1] = nil
-			machines = machines[:len(machines)-1]
-			break
-		}
-	}
-	machinesLocker.Unlock()
-
 }

@@ -28,7 +28,7 @@ func ConnectTo(reciverIP string) {
 		log.Println("Connect to 1 : ", err)
 		return
 	}
-	connConfig.Header.Add("Requester-IP", myIP+":"+network_data_handler.TCPPort)
+	connConfig.Header.Add("Partner-Ip", myIP+":"+network_data_handler.TCPPort)
 
 	dataConn, err := websocket.DialConfig(connConfig)
 	if err != nil {

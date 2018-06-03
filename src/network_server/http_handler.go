@@ -42,6 +42,7 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 		break
 	case "Accept-Offer":
 		// go start
+		network_data_handler.StartSending()
 		ip := req.Header.Get("Requester-IP")
 		if len(ip) == 0 {
 			http.Error(w, "Requester-IP expected", 500)

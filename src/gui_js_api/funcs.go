@@ -5,8 +5,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
-	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 	webview "github.com/zserge/webview"
 )
 
@@ -30,7 +30,7 @@ func UpdateIP(w *webview.WebView) {
 }
 
 func GetConnectedIPs(w *webview.WebView) {
-	IPs := websocket_work.GetConnectedIPs()
+	IPs := network_data_handler.GetConnectedIPs()
 	log.Println(IPs)
 	s := fmt.Sprintf(`redrawIPs(["%s"])`, strings.Join(IPs, ","))
 

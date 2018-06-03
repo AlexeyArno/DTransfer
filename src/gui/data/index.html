@@ -432,7 +432,7 @@
                     if(window.transData.path=="none"){
                         alertEl.innerHTML="Choose directory!!!"
                     }else if(!ip){
-                        alertEl.innerHTML="Choose IP!!!"
+                        alertEl.innerHTML="Choose reciever!!!"
                     }else{
                         alertEl.innerHTML=""
                         beginEl.style.display = 'none'
@@ -539,10 +539,8 @@
 
                 document.getElementById('choose').addEventListener("click", chooseFunc);
                 document.getElementById("reload_ips").addEventListener("click", reloadConnectedIPs)
-                // document.getElementById('begin_svg').addEventListener('click', start)
                 
-                progress(80)
-                // doAnim()
+                reloadConnectedIPs()
               
                 window.external.invoke('myIP')
 
@@ -564,12 +562,6 @@
                         selector.appendChild(newEl)
                     });
                 }
-
-              
-             
-
-               
-
                 
                 function progress(val){
                     var fin = 3.6* val
