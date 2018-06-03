@@ -4,6 +4,8 @@ import (
 	"log"
 	"net"
 	"sync"
+
+	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 )
 
 // BroadcastTo hello
@@ -42,7 +44,7 @@ func sendMessage(ip string, myAddres string, port string, wg *sync.WaitGroup) {
 
 	defer Conn.Close()
 	// log.Println("Send to ", ip)
-	_, err = Conn.Write([]byte(myAddres))
+	_, err = Conn.Write([]byte(myAddres + ":" + network_data_handler.TCPPort))
 	if err != nil {
 		log.Println("Broadcast 4", err)
 	}

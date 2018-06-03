@@ -1,24 +1,30 @@
 package websocket_work
 
 import (
-	"fmt"
 	"log"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // socketListener listen socket for new message
 // connType: 0 - info , 1 - data connection
 
 func listenDataChannel(ws *websocket.Conn, clientOrServer uint8) {
-	msg := make([]byte, 1024)
+	// msg := make([]byte, 4100)
 	for {
-		err := websocket.Message.Receive(ws, &msg)
+		_, msg, err := ws.ReadMessage()
 		if err != nil {
 			log.Println("Data channel 2, type ", clientOrServer, " error: ", err)
 			break
 		} else {
-			fmt.Printf("Received: %s.\n", msg)
+			log.Println("Received: ", msg[:4], " ", msg[5:8])
+			// ip, err := network_data_handler.GetIPByConnection(ws)
+			// if err != nil {
+			// 	continue
+			// } else {
+			// 	network_data_handler.DownloadPacketSequence <- network_data_handler.Packet{IP: ip, Data: msg}
+			// }
+
 		}
 	}
 	leaving <- ws

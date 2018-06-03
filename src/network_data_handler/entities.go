@@ -1,10 +1,16 @@
 package network_data_handler
 
 import (
+	"errors"
 	"log"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
+
+type Packet struct {
+	IP   string
+	Data []byte
+}
 
 type Machine struct {
 	dataConn *websocket.Conn
@@ -19,11 +25,33 @@ func AddMachine(IP string, conn *websocket.Conn) {
 	machinesLocker.Unlock()
 }
 
+func GetConnectionByIP(IP string) (*websocket.Conn, error) {
+	machinesLocker.Lock()
+	defer machinesLocker.Unlock()
+	for _, m := range machines {
+		if (*m).IP == IP {
+			return (*m).dataConn, nil
+		}
+	}
+	return nil, errors.New("Machine didn't find")
+}
+
+func GetIPByConnection(c *websocket.Conn) (string, error) {
+	machinesLocker.Lock()
+	defer machinesLocker.Unlock()
+	for _, m := range machines {
+		if (*m).dataConn == c {
+			return (*m).IP, nil
+		}
+	}
+	return "", errors.New("Machine didn't find")
+}
+
 func MachineIsHere(w *websocket.Conn) bool {
 	machinesLocker.Lock()
 	defer machinesLocker.Unlock()
 	for _, m := range machines {
-		if (*m).IP == w.Config().Origin.Host || (*m).IP == w.Request().Header.Get("Partner-Ip") {
+		if (*m).dataConn == w {
 			return true
 		}
 	}
@@ -33,7 +61,7 @@ func MachineIsHere(w *websocket.Conn) bool {
 func DeleteMachine(w *websocket.Conn) {
 	machinesLocker.Lock()
 	for i, machine := range machines {
-		if machine.IP == w.Config().Origin.Host || machine.IP == w.Request().Header.Get("Partner-Ip") {
+		if (*machine).dataConn == w {
 			machines[i] = machines[len(machines)-1]
 			machines[len(machines)-1] = nil
 			machines = machines[:len(machines)-1]

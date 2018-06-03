@@ -8,14 +8,23 @@ import (
 	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 	"github.com/AlexeyArno/golang-files-transfer/src/network_scan"
 	network_server "github.com/AlexeyArno/golang-files-transfer/src/network_server"
-	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
+	"github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 	"github.com/zserge/webview"
-	"golang.org/x/net/websocket"
 )
 
 var close = make(chan struct{})
 
 func main() {
+	port, err := network_scan.ReservTCPPort()
+	if err != nil {
+		panic(err)
+	}
+
+	network_data_handler.RegisterTCPPort(port)
+	log.Println("Listen TCP port: ", port)
+
+	go network_scan.SetupSanner()
+
 	data, err := gui.Asset("data/index.html")
 	if err != nil {
 		panic(err)
@@ -25,15 +34,7 @@ func main() {
 		w.Write(data)
 	})
 	http.HandleFunc("/info", network_server.InfoHandler)
-	http.Handle("/websocket_data", websocket.Handler(websocket_work.DataHandler))
-
-	port, err := network_scan.ReservTCPPort()
-	if err != nil {
-		panic(err)
-	}
-
-	network_data_handler.RegisterTCPPort(port)
-	log.Println("Listen TCP port: ", port)
+	http.HandleFunc("/websocket_data", websocket_work.DataHandler)
 
 	go func(port string) {
 		if err := http.ListenAndServe(":"+port, nil); err != nil {

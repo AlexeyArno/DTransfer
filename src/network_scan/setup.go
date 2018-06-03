@@ -8,7 +8,7 @@ import (
 
 var messages chan (string) = make(chan string, 4)
 
-func init() {
+func SetupSanner() {
 	myAddress, err := utility.MyIP()
 	if err != nil {
 		log.Println(err)

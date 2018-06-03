@@ -42,13 +42,14 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 		break
 	case "Accept-Offer":
 		// go start
-		network_data_handler.StartSending()
 		ip := req.Header.Get("Requester-IP")
 		if len(ip) == 0 {
 			http.Error(w, "Requester-IP expected", 500)
 		}
+		network_data_handler.RecieverIP = ip
 		log.Println(ip, " accepted your offer")
 		gui.ShippedOfferAccepted()
+		go network_data_handler.StartSending()
 
 		break
 	case "Cancel-Offer":

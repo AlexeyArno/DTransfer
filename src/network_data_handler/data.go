@@ -3,7 +3,7 @@ package network_data_handler
 import (
 	"sync"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 var TCPPort string
@@ -18,12 +18,18 @@ var (
 	SenderIP   string
 )
 
+var DataSize = 17520
+var BufferSize = DataSize + 4
+
 var PartnerConn *websocket.Conn
 
 var (
 	machines       []*Machine
 	machinesLocker = &sync.Mutex{}
 )
+
+var DownloadPacketSequence chan (Packet)
+var UploadPacketSequence chan (Packet)
 
 func RegisterTCPPort(IP string) {
 	TCPPort = IP

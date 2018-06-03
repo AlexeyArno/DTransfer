@@ -4,7 +4,6 @@ import (
 	"log"
 	"net"
 
-	"github.com/AlexeyArno/golang-files-transfer/src/utility"
 	websocket_work "github.com/AlexeyArno/golang-files-transfer/src/websocket_work"
 )
 
@@ -32,12 +31,14 @@ func Listen(myAddressWPort string, port string, ipFound func(string), messages *
 	buf := make([]byte, 1024)
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
-		cleanIP := utility.GetCleanIPFromString(addr.String())
+		// cleanIP := utility.GetCleanIPFromString(addr.String())
 		// fmt.Println(cleanIP)
 		if addr.String() != myAddressWPort+":"+port {
 			if !stringInSlice(string(buf[0:n]), usefullIps) {
-				gotUsefullIP(cleanIP, port)
+				// 	gotUsefullIP(cleanIP, port)
+				go websocket_work.ConnectTo(string(buf[0:n]))
 			}
+			// go websocket_work.ConnectTo(ip + ":" + port)
 		}
 		if err != nil {
 			log.Println("Error: ", err)

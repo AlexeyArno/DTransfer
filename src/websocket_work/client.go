@@ -2,12 +2,20 @@ package websocket_work
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 
+	"net/url"
+
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  network_data_handler.BufferSize,
+	WriteBufferSize: network_data_handler.BufferSize,
+}
 
 // ConnectTo data and info channels
 func ConnectTo(reciverIP string) {
@@ -17,27 +25,20 @@ func ConnectTo(reciverIP string) {
 		panic(err)
 	}
 	if reciverIP == myIP+":"+network_data_handler.TCPPort {
-		// log.Println("Reciever IP equal my IP")
 		return
 	}
-	origin := "http://" + reciverIP + "/"
-	urlData := "ws://" + reciverIP + "/websocket_data"
 
-	connConfig, err := websocket.NewConfig(urlData, origin)
+	u := url.URL{Scheme: "ws", Host: reciverIP, Path: "/websocket_data"}
+	log.Println("try connect to ", u.String())
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(),
+		http.Header{"Partner-Ip": []string{myIP + ":" + network_data_handler.TCPPort}})
 	if err != nil {
-		log.Println("Connect to 1 : ", err)
+		log.Fatal("dial:", err)
 		return
 	}
-	connConfig.Header.Add("Partner-Ip", myIP+":"+network_data_handler.TCPPort)
 
-	dataConn, err := websocket.DialConfig(connConfig)
-	if err != nil {
-		// log.Println("WebSocket Client 1: ", err)
-	} else {
-		// dataConn.Config().Header.Add("Requester-IP", myIP+":"+tcpPort)
-		log.Println("Connected to ", dataConn.Config().Origin.Host)
-		enteringData <- dataConn
-		go listenDataChannel(dataConn, 0)
-	}
+	enteringData <- newConn{c, reciverIP}
+	go listenDataChannel(c, 0)
 
 }

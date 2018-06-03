@@ -39,7 +39,7 @@ func pathBack() {
 	visited = append(visited, currentPath)
 
 	for i := range currentPath {
-		if currentPath[len(currentPath)-1-i] == '\\' {
+		if currentPath[len(currentPath)-1-i] == '/' {
 			currentPath = currentPath[:len(currentPath)-1-i]
 			return
 		}
@@ -60,38 +60,35 @@ func inVisited(path string) bool {
 }
 
 func Next() (string, bool, error) {
-	if counter > 100 {
-		counter = 0
-		return "", false, errors.New("Limit")
-	}
-	files, err := ioutil.ReadDir(beginPath + "\\" + currentPath)
+	files, err := ioutil.ReadDir(beginPath + "/" + currentPath)
 	if err != nil {
 		return "", false, err
 	}
 	visitedCount := 0
+
 	for _, f := range files {
-		if !inVisited(currentPath + "\\" + f.Name()) {
-			visited = append(visited, currentPath+"\\"+f.Name())
+		if !inVisited(currentPath + "/" + f.Name()) {
+			visited = append(visited, currentPath+"/"+f.Name())
 			if f.IsDir() {
 				Dirs++
-				currentPath = currentPath + "\\" + f.Name()
+				currentPath = currentPath + "/" + f.Name()
 				return beginPath + currentPath, true, nil
 			} else {
 				Files++
-				return beginPath + currentPath + "\\" + f.Name(), false, nil
+				return beginPath + currentPath + "/" + f.Name(), false, nil
 			}
-
 		} else {
 			visitedCount++
 		}
 	}
 	if visitedCount == len(files) {
 		if currentPath == "" {
+			visited = visited[:0]
 			return "", false, errors.New("All visited")
 		}
 		pathBack()
 		return Next()
 	}
-	counter++
+	visited = visited[:0]
 	return "", false, errors.New("All visited")
 }
