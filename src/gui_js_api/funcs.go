@@ -36,3 +36,11 @@ func GetConnectedIPs(w *webview.WebView) {
 
 	(*w).Eval(s)
 }
+
+func GetDashboardData(w *webview.WebView) {
+	speed := network_data_handler.GetSpeed()
+	path := network_data_handler.GetCurrentPath()
+	s := fmt.Sprintf(`refreshDashboard("%s", %d)`, path, speed)
+	log.Println("GuiJSApi: ", s)
+	(*w).Eval(s)
+}

@@ -20,6 +20,7 @@ func listenDataChannel(ws *websocket.Conn, clientOrServer uint8) {
 			log.Println("Received: ", msg[:4], " ", msg[5:8])
 			// ip, err := network_data_handler.GetIPByConnection(ws)
 			// if err != nil {
+			// 	log.Println("IP haven't rights")
 			// 	continue
 			// } else {
 			// 	network_data_handler.DownloadPacketSequence <- network_data_handler.Packet{IP: ip, Data: msg}

@@ -60,6 +60,7 @@
                     /* position: relative; */
                     /* z-index: 1200; */
                     margin-top: 18px;
+                    margin-bottom: 15px;
                     /* background: red; */
                 }
 
@@ -97,7 +98,12 @@
                 }
                 
                 .form{
-                    padding-top: 10px;
+                    /* padding-top: 10px; */
+                    /* position: relative; */
+                    /* top:20px; 
+                */
+                    
+                    height: 30px;
                 }
                 
                 .now_file{
@@ -107,10 +113,13 @@
                 
                 /* Direcory  */
                 .directory_form{
-                    padding-top: 30px;
-                    
+                    /* padding-top: 30px; */
+                    /* position: relative; */
+                    /* top:20px; */
                     margin: auto;
                     width: 200px;
+                    height: 15px;
+                    margin-top: 35px;
 
                 }
                 .choosen_directory{
@@ -138,7 +147,7 @@
                     margin-left: -5px;
                 }
                 #select_ip{
-                    width: 125px;
+                    width: 113px;
                     border-radius: 2.5px;
                     background: #c4c4c4;
                     margin-left: 10px;
@@ -146,7 +155,7 @@
                 
                 #begin{
                     /* opacity: 0.3; */
-                    margin-top: 20px;
+                    margin-top: 30px;
                     
                 }
                 #begin_svg,
@@ -162,7 +171,6 @@
                 .image_button{
                     width: 50px;
                     height: 50px;
-
                 }
                 #stop_svg,
                 #loader,
@@ -170,6 +178,7 @@
                     display: none;
                 }
                 #loader{
+                    margin-top: -2.5px;
                     transform: rotate(20deg); 
                 }
                 #circleLoader,
@@ -199,11 +208,27 @@
                 }
                 .log{
                     max-height: 40px;
+                    height: 40px;
                     text-align: left;
-                    width:200px;
+                    width:250px;
+                    display: inline-block;
                     margin:auto;
                     opacity: 0.3;
                     overflow: hidden;
+                }
+
+                .dashboard{
+                    opacity: 0.3;
+                    width: 200px;
+                    margin: auto;
+                    position: relative;
+                    top: 30px;
+                }
+                .dashboard_file{
+                    float: left;
+                }
+                .dashboard_speed{
+                    float:right
                 }
                 #reload_ips{
                     width:20px;
@@ -331,11 +356,10 @@
                             </g>
                         </svg>
                     </div>
-
                     <div  id="break_svg" onclick="breakLoad()" title="Cancel upload">
-                        <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 212.982 212.982" style="enable-background:new 0 0 212.982 212.982;" xml:space="preserve" width="512px" height="512px">
-                            <g id="Close">
-                                <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M131.804,106.491l75.936-75.936c6.99-6.99,6.99-18.323,0-25.312   c-6.99-6.99-18.322-6.99-25.312,0l-75.937,75.937L30.554,5.242c-6.99-6.99-18.322-6.99-25.312,0c-6.989,6.99-6.989,18.323,0,25.312   l75.937,75.936L5.242,182.427c-6.989,6.99-6.989,18.323,0,25.312c6.99,6.99,18.322,6.99,25.312,0l75.937-75.937l75.937,75.937   c6.989,6.99,18.322,6.99,25.312,0c6.99-6.99,6.99-18.322,0-25.312L131.804,106.491z" fill="#FFFFFF"/>
+                        <svg class="active_button" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 232.679 232.679" style="enable-background:new 0 0 232.679 232.679;" xml:space="preserve" width="512px" height="512px">
+                            <g id="Stop">
+                                <path style="fill-rule:evenodd;clip-rule:evenodd;" d="M214.781,0H17.898C8.013,0,0,8.014,0,17.898v196.883   c0,9.885,8.013,17.898,17.898,17.898h196.883c9.886,0,17.898-8.013,17.898-17.898V17.898C232.679,8.014,224.666,0,214.781,0z" fill="#FFFFFF"/>
                             </g>
                         </svg>
                     </div>
@@ -351,8 +375,17 @@
                                     </g>
                                   </svg>
                     </div>
-            <div class="log" id="log"></div>      
+            
                 </div>
+                <div class="dashboard">
+                    <div class="dashboard_file" id="dash_file">
+                         ...
+                    </div>
+                    <div class="dashboard_speed" id="dash_speed">
+                        0 B/s
+                    </div>
+                </div>
+                <!-- <div class="log" id="log"></div>      -->
                 
                 <div id="offer">
                     <div id="offer_body">
@@ -372,7 +405,7 @@
             <script>
                 window.transData = {path: "d:/129/788"};
             </script>
-
+            <!-- Animation -->
             <script>
             "use strict";
 
@@ -417,7 +450,49 @@
             circleLoader.currentTheta = initialTheta; // The initial rotation angle to use when the animation starts, stored in a custom property.
 
          
-        </script>
+            </script>
+            <!-- Dashboard Control -->
+            <script>
+                var interval
+                var fileEl = document.getElementById("dash_file")
+                var speedEl = document.getElementById("dash_speed")
+                function beginRefreshDashboard(){
+                    clearInterval(interval)
+                    interval = setInterval(function(){
+                        window.external.invoke("getDashboardData")
+                    }, 1000);
+                }
+
+                function stopRefreshDashboard(){
+                    clearInterval(interval)
+                }
+
+                function clearDashBoard(){
+                    fileEl.innerHTML = "..."
+                    speedEl.innerHTML = "0 B/s"
+                }
+
+                function refreshDashboard(file, speed){
+                    if(file.length >= 14){
+                        file = file.substr(file.length-14, file.length-1)
+                    }
+                    var suffix = " B/s"
+                    switch (true) {
+                        case speed>1048576:
+                            speed = speed/1048576
+                            suffix = " Mb/s"
+                            break
+                        case speed>1024:
+                            speed = speed/1024
+                            suffix = " Kb/s"
+                            break
+                    }
+                    speed = Math.round( speed * 10 ) / 10
+                    fileEl.innerHTML = file
+                    speedEl.innerHTML = speed+suffix
+                    
+                }
+            </script>
             <!-- Loaders script -->
             <script>
                 var alertEl = document.getElementById("alert")
@@ -425,14 +500,22 @@
                 var stopEl = document.getElementById("stop_svg")
                 var breakEl = document.getElementById("break_svg")
                 var loaderEl = document.getElementById("loader")
-
+                
+                var uploadNow = false
 
                 function offerLoad(){
+                    if (uploadNow){
+                        window.external.invoke("continueUpload")
+                        beginEl.style.display = 'none'
+                        stopEl.style.display = 'inline-block'
+                        beginRefreshDashboard()
+                        return
+                    }
                     var ip = document.getElementById("select_ip").value;
                     if(window.transData.path=="none"){
-                        alertEl.innerHTML="Choose directory!!!"
+                        alertEl.innerHTML="Choose directory"
                     }else if(!ip){
-                        alertEl.innerHTML="Choose reciever!!!"
+                        alertEl.innerHTML="Choose reciever"
                     }else{
                         alertEl.innerHTML=""
                         beginEl.style.display = 'none'
@@ -444,22 +527,31 @@
                 }
 
                 function stopLoad(){
+                    window.external.invoke("stopUpload")
                     stopEl.style.display = 'none'
                     beginEl.style.display = 'inline-block'
+                    stopRefreshDashboard()
 
                 }
 
                 function breakLoad(){
+                    window.external.invoke("breakUpload")
+                    stopRefreshDashboard()
+                    clearDashBoard()
+                    uploadNow = false
                     stopEl.style.display = 'none'
                     breakEl.style.display = 'none'
                     beginEl.style.display = 'inline-block'
                 }
 
                 function offerAccepted(){
+                    uploadNow = true
                     StopLoaderAnimation()
+                    
                     loaderEl.style.display = "none"
                     stopEl.style.display = 'inline-block'
                     breakEl.style.display = 'inline-block'
+                    beginRefreshDashboard()
                 }
 
                 function offerCanceled(reason){

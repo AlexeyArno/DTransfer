@@ -2,10 +2,12 @@ package network_data_handler
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"time"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/fs"
 	"github.com/gorilla/websocket"
@@ -14,12 +16,50 @@ import (
 var recieveConnection *websocket.Conn
 var uploaded chan (struct{})
 
+var stopChannel chan (struct{}) = make(chan (struct{}), 1)
+var breakChannel chan (struct{}) = make(chan (struct{}), 1)
+var continueChannel chan (struct{}) = make(chan (struct{}), 1)
+
+var uploadNow bool
+
+var packetCounter uint8
+
+var packetSum uint32 = 0
+var packetTime uint32 = 0
+
+func StopUpload() {
+	if !uploadNow {
+		return
+	}
+
+	stopChannel <- struct{}{}
+	log.Println("StopUpload")
+}
+
+func BreakUpload() {
+	if !uploadNow {
+		return
+	}
+
+	breakChannel <- struct{}{}
+	log.Println("BreakUpload")
+}
+
+func ContinueUpload() {
+	if !uploadNow {
+		return
+	}
+	continueChannel <- struct{}{}
+	log.Println("ContinueUpload")
+}
+
 func init() {
 	// go initSending()
 }
 
 // StartSending very well
 func StartSending() {
+
 	log.Println("RecieverIP: ", RecieverIP)
 	fs.SetPath(UploadPath)
 	conn, err := GetConnectionByIP(RecieverIP)
@@ -29,24 +69,33 @@ func StartSending() {
 	} else {
 		recieveConnection = conn
 	}
+	uploadNow = true
+	defer func() { uploadNow = false }()
 	workWithFiles()
 	// go getFiles()
 }
 
 func workWithFiles() {
 	log.Println("Work with files")
+	if !uploadNow {
+		return
+	}
 	path, idDir, err := fs.Next()
 	if err != nil {
 		log.Println("StartSending: ", err)
 		return
 	}
 	if !idDir {
+		currentPathLocker.Lock()
+		currentPath = path
+		currentPathLocker.Unlock()
 		err = readChunkAndSend(path)
 		if err != nil {
 			log.Println("StartSending 2: ", err)
 			return
 		}
 	}
+	time.Sleep(time.Second)
 	workWithFiles()
 }
 
@@ -65,33 +114,52 @@ func readChunkAndSend(path string) error {
 	data := make([]byte, DataSize)
 
 	for {
-		n, err := file.Read(data)
-		if err == io.EOF { // если конец файла
-			break // выходим из цикла
-		}
-		err = send(n, &data)
-		if err != nil {
-			return err
+
+		select {
+		case _ = <-stopChannel:
+			<-continueChannel
+		case _ = <-breakChannel:
+			fs.Clear()
+			log.Println("Im breaking")
+			return errors.New("Sender break upload")
+		default:
+			n, err := file.Read(data)
+			if err == io.EOF { // если конец файла
+				return nil // выходим из цикла
+			}
+			err = send(n, &data)
+			if err != nil {
+				return err
+			}
 		}
 	}
-	// time.Sle
 	return nil
 }
 
 func send(n int, data *[]byte) error {
-	log.Println("Send chunk")
 	finData := make([]byte, BufferSize)
 	bs := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bs, uint32(n))
-	log.Println("Counter Buffer: ", bs)
 	finData = append(bs, (*data)...)
 
-	log.Println("Send Chunk ", finData[:4], " ", finData[5:8], " ", n)
+	begin := time.Now().UnixNano()
+
 	err := recieveConnection.WriteMessage(websocket.BinaryMessage, finData)
 	if err != nil {
 		log.Println("Send file_send:", err)
 		return err
 	}
+	// log.Println("Send Chunk ", n)
+	packetSum += uint32(n)
+	packetTime += uint32((time.Now().UnixNano() - begin) / int64(time.Millisecond))
+	if packetCounter >= 10 {
+		lastPacketTimeLocker.Lock()
+		last10PacketTime = packetTime
+		last10PacketSize = packetSum
+		lastPacketTimeLocker.Unlock()
+		packetCounter = 0
+	}
+	packetCounter++
 
 	return nil
 }

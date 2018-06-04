@@ -18,6 +18,14 @@ var (
 	SenderIP   string
 )
 
+var lastPacketTimeLocker = &sync.Mutex{}
+var last10PacketTime uint32 = 1
+var last10PacketSize uint32 = 1
+var currentPathLocker = &sync.Mutex{}
+var currentPath string
+
+// var byteTransfered uint64
+
 var DataSize = 17520
 var BufferSize = DataSize + 4
 
@@ -37,4 +45,22 @@ func RegisterTCPPort(IP string) {
 
 func RegisterPartnerConn(conn *websocket.Conn) {
 	PartnerConn = conn
+}
+
+func GetSpeed() uint32 {
+	lastPacketTimeLocker.Lock()
+	if last10PacketTime == 0 {
+		last10PacketTime = 1
+	}
+	ret := (last10PacketSize / last10PacketTime) * 1000
+	lastPacketTimeLocker.Unlock()
+	return ret
+	// return uint64(finish)
+}
+
+func GetCurrentPath() string {
+	currentPathLocker.Lock()
+	ret := currentPath
+	currentPathLocker.Unlock()
+	return ret
 }

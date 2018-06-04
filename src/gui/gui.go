@@ -23,6 +23,14 @@ func HandleRPC(w webview.WebView, data string) {
 		gui_js_api.UpdateIP(&w)
 	case data == "getConnectedIPs":
 		gui_js_api.GetConnectedIPs(&w)
+	case data == "stopUpload":
+		go network_data_handler.StopUpload()
+	case data == "breakUpload":
+		go network_data_handler.BreakUpload()
+	case data == "continueUpload":
+		go network_data_handler.ContinueUpload()
+	case data == "getDashboardData":
+		gui_js_api.GetDashboardData(currentWindow)
 	case strings.HasPrefix(data, "acceptTransitOffer:"):
 		IP := strings.TrimPrefix(data, "acceptTransitOffer:")
 		log.Println("I accept to ", IP)

@@ -19,6 +19,10 @@ var Files uint64 = 0
 
 var visited []string
 
+func Clear() {
+	visited = visited[:0]
+}
+
 func SetPath(p string) {
 	currentPath = ""
 	beginPath = p
