@@ -1,7 +1,6 @@
 package network_client
 
 import (
-	"log"
 	"strconv"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
@@ -28,7 +27,7 @@ func SendOffer(directoryName, ip string) error {
 
 	_, err := sendRequest(&dataFinal, &headers, ip)
 	if err != nil {
-		log.Println("Send Offer: ", err)
+		// log.Println("Send Offer: ", err)
 		return err
 	}
 	return nil
@@ -39,7 +38,7 @@ func SendAcceptOffer(ip string) error {
 		"Requester-IP": MyIP + ":" + myTCPPort}
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendAcceptOffer: ", err)
+		// log.Println("SendAcceptOffer: ", err)
 		return err
 	}
 	return nil
@@ -51,7 +50,7 @@ func SendCancelOffer(ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendCancelOffer : ", err)
+		// log.Println("SendCancelOffer : ", err)
 		return err
 	}
 	return nil
@@ -64,7 +63,7 @@ func SendNewFileOffer(relativePath string, ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendNewFileOffer : ", err)
+		// log.Println("SendNewFileOffer : ", err)
 		return err
 	}
 	return nil
@@ -77,7 +76,7 @@ func SendNewDirectoryOffer(relativePath string, ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendNewDirectoryOffer : ", err)
+		// log.Println("SendNewDirectoryOffer : ", err)
 		return err
 	}
 	return nil
@@ -90,7 +89,7 @@ func SendDoneRequest(packetCount uint64, ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendDoneRequest : ", err)
+		// log.Println("SendDoneRequest : ", err)
 		return err
 	}
 	return nil
@@ -102,7 +101,7 @@ func SendBrokeRequest(ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendBrokeRequest : ", err)
+		// log.Println("SendBrokeRequest : ", err)
 		return err
 	}
 	return nil
@@ -115,7 +114,7 @@ func SendFullSize(size uint64, ip string) error {
 
 	_, err := sendRequest(nil, &headers, ip)
 	if err != nil {
-		log.Println("SendDoneRequest : ", err)
+		// log.Println("SendDoneRequest : ", err)
 		return err
 	}
 	return nil

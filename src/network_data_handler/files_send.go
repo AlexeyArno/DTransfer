@@ -40,7 +40,7 @@ func StopUpload() {
 	}
 
 	stopChannel <- struct{}{}
-	log.Println("StopUpload")
+	// log.Println("StopUpload")
 }
 
 func BreakUpload() {
@@ -49,7 +49,7 @@ func BreakUpload() {
 	}
 
 	breakChannel <- struct{}{}
-	log.Println("BreakUpload")
+	// log.Println("BreakUpload")
 }
 
 func ContinueUpload() {
@@ -57,7 +57,7 @@ func ContinueUpload() {
 		return
 	}
 	continueChannel <- struct{}{}
-	log.Println("ContinueUpload")
+	// log.Println("ContinueUpload")
 }
 
 func init() {
@@ -66,9 +66,10 @@ func init() {
 
 // StartSending very well
 func StartSending(uploadDoneCallback func()) {
+	breakChannel = make(chan (struct{}), 1)
 	totalDirSizeByte = fs.DirSizeByte(UploadPath)
 	network_client.SendFullSize(totalDirSizeByte, RecieverIP)
-	log.Println("RecieverIP: ", RecieverIP)
+	// log.Println("RecieverIP: ", RecieverIP)
 	fs.SetPath(UploadPath)
 	conn, err := GetConnectionByIP(RecieverIP)
 	if err != nil {
@@ -85,15 +86,20 @@ func StartSending(uploadDoneCallback func()) {
 }
 
 func workWithFiles(uploadDoneCallback func()) {
-	log.Println("Work with files")
+	// log.Println("Work with files")
 	if !uploadNow {
 		return
 	}
 	path, isDir, err := fs.Next()
 	if err != nil {
 		log.Println("StartSending: ", err)
+		log.Println("Transfered: ", nowBytesTransfered, "/", totalDirSizeByte)
 		if nowBytesTransfered == totalDirSizeByte {
 			fs.Clear()
+			nowBytesTransfered = 0
+			totalPacketSendCount = 0
+			packetCounter = 0
+			packetTime = 0
 			network_client.SendDoneRequest(totalPacketSendCount, RecieverIP)
 			uploadDoneCallback()
 		}
@@ -117,7 +123,7 @@ func workWithFiles(uploadDoneCallback func()) {
 
 func readChunkAndSend(path string, uploadDoneCallback func()) error {
 
-	log.Println("Read Chunk ", path)
+	// log.Println("Read Chunk ", path)
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -136,7 +142,10 @@ func readChunkAndSend(path string, uploadDoneCallback func()) error {
 		case _ = <-breakChannel:
 			fs.Clear()
 			network_client.SendBrokeRequest(RecieverIP)
-			log.Println("Im breaking")
+			nowBytesTransfered = 0
+			totalPacketSendCount = 0
+			packetCounter = 0
+			packetTime = 0
 			return errors.New("Sender break upload")
 		default:
 			n, err := file.Read(data)
@@ -162,7 +171,7 @@ func send(n int, data *[]byte) error {
 
 	err := recieveConnection.WriteMessage(websocket.BinaryMessage, finData)
 	if err != nil {
-		log.Println("Send file_send:", err)
+		// log.Println("Send file_send:", err)
 		return err
 	}
 	// bytsCount := binary.LittleEndian.Uint32(finData[:4])
@@ -177,7 +186,7 @@ func send(n int, data *[]byte) error {
 		packetCounter = 0
 	}
 	nowBytesTransfered += uint64(n)
-	log.Println("Sended  ", nowBytesTransfered, "/", totalDirSizeByte, " KB")
+	// log.Println("Sended  ", nowBytesTransfered, "/", totalDirSizeByte, " KB")
 	totalPacketSendCount++
 	packetCounter++
 

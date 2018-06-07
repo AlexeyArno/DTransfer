@@ -1,6 +1,7 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -15,19 +16,21 @@ import (
 var close = make(chan struct{})
 
 func main() {
+	log.SetOutput(ioutil.Discard)
 	port, err := network_scan.ReservTCPPort()
 	if err != nil {
 		panic(err)
 	}
 
 	network_data_handler.RegisterTCPPort(port)
-	log.Println("Listen TCP port: ", port)
+	// log.Println("Listen TCP port: ", port)
 
 	go network_scan.SetupSanner()
 
 	data, err := gui.Asset("data/index.html")
 	if err != nil {
-		panic(err)
+		// panic(err)
+		return
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +41,8 @@ func main() {
 
 	go func(port string) {
 		if err := http.ListenAndServe(":"+port, nil); err != nil {
-			panic(err)
+			// panic(err)
+			return
 		}
 	}(port)
 
@@ -51,6 +55,6 @@ func main() {
 	gui.RegisterGUI(&w)
 	defer w.Exit()
 	w.Run()
-	<-close
+	// <-close
 
 }

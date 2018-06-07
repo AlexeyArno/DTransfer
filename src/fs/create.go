@@ -1,7 +1,6 @@
 package fs
 
 import (
-	"log"
 	"os"
 )
 
@@ -11,7 +10,7 @@ func CreateDirectory(path string) {
 		if err != nil {
 			panic(err)
 		} else {
-			log.Println("Create Dir:", path)
+			// log.Println("Create Dir:", path)
 		}
 	}
 }
@@ -25,7 +24,7 @@ func CreateFile(path string) {
 		if err != nil {
 			panic(err)
 		} else {
-			log.Println("Create File:", path)
+			// log.Println("Create File:", path)
 		}
 		defer file.Close()
 	}

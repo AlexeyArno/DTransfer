@@ -10,14 +10,14 @@ func RegisterGUI(window *webview.WebView) {
 	currentWindow = window
 }
 
-// func Log(logs string) {
-// 	if currentWindow == nil {
-// 		return
-// 	}
-// 	(*currentWindow).Dispatch(func() {
-// 		(*currentWindow).Eval(fmt.Sprintf(`setLog("%s")`, logs))
-// 	})
-// }
+func Alert(reason string) {
+	if currentWindow == nil {
+		return
+	}
+	(*currentWindow).Dispatch(func() {
+		(*currentWindow).Eval(fmt.Sprintf(`alertPage("%s")`, reason))
+	})
+}
 
 func DialogInfo(body string) {
 	if currentWindow == nil {

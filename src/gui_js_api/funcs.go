@@ -41,16 +41,15 @@ func GetDashboardData(w *webview.WebView) {
 	speed := network_data_handler.GetSpeed()
 	path := network_data_handler.GetCurrentPath()
 	progress := network_data_handler.GetProgress()
-	log.Println("Progress: ", progress, "%")
+	// log.Println("Progress: ", progress, "%")
 	s := fmt.Sprintf(`refreshDashboard("%s", %d, %d)`, path, speed, progress)
 	(*w).Eval(s)
 }
 
 func GetDashboardDataDownload(w *webview.WebView) {
-	path := network_data_handler.GetDownloadPath()
+	path := network_data_handler.GetCurrentRelativePath()
 	progress := network_data_handler.GetDownloadProgress()
-
-	log.Println("Progress Download: ", progress, "%")
+	// log.Println("Progress Download: ", progress, "%")
 	s := fmt.Sprintf(`refreshDashboardDownload("%s", %d)`, path, progress)
 	(*w).Eval(s)
 }

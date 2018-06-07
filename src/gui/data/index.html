@@ -425,6 +425,15 @@
             </script>
             <script>
                 window.transData = {path: "d:/129/788"};
+                var alertEl = document.getElementById("alert")
+                var beginEl = document.getElementById("begin_svg")
+                var stopEl = document.getElementById("stop_svg")
+                var breakEl = document.getElementById("break_svg")
+                var loaderEl = document.getElementById("loader")
+
+                function alertPage(reason){
+                    alertEl.innerHTML = reason
+                }
             </script>
             <!-- Animation -->
             <script>
@@ -521,11 +530,7 @@
             </script>
             <!-- Loaders script -->
             <script>
-                var alertEl = document.getElementById("alert")
-                var beginEl = document.getElementById("begin_svg")
-                var stopEl = document.getElementById("stop_svg")
-                var breakEl = document.getElementById("break_svg")
-                var loaderEl = document.getElementById("loader")
+               
                 
                 var uploadNow = false
 
@@ -562,6 +567,7 @@
 
                 function breakLoad(){
                     if (downloadNow){
+                        window.external.invoke("breakDownload")
                         breakDownload()
                         return
                     }
@@ -627,7 +633,6 @@
                     downloadNow = false
                     stopRefreshDashboardDownload()
                     progress(0)
-                    window.external.invoke("breakDownload")
                     beginEl.style.display = 'inline-block'
                     breakEl.style.display   = "none"
                 }

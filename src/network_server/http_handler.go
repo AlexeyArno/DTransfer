@@ -3,7 +3,6 @@ package network_server
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -48,13 +47,13 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 	case "Accept-Offer":
 		// go start
 		network_data_handler.RecieverIP = ip
-		log.Println(ip, " accepted your offer")
+		// log.Println(ip, " accepted your offer")
 		gui.ShippedOfferAccepted()
 		go network_data_handler.StartSending(gui.UploadDone)
 
 		break
 	case "Cancel-Offer":
-		log.Println(ip, " canceled your offer")
+		// log.Println(ip, " canceled your offer")
 		network_data_handler.RecieverIP = ""
 		gui.ShippedOfferCanceled(ip + " disline your offer")
 		break
@@ -96,7 +95,8 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 			}
 			i, err := strconv.ParseUint(pockets, 10, 64)
 			if err != nil {
-				panic(err)
+				// panic(err)
+				return
 			}
 			network_data_handler.Done(i)
 			w.Write([]byte(`1`))
@@ -106,25 +106,27 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 		}
 		break
 	case "Size":
-		log.Println("Size Got!!!!!!!!")
 		if ip == network_data_handler.SenderIP {
 			size := req.Header.Get("Size")
-			log.Println("My Size is ", size)
 			if len(size) == 0 {
 				http.Error(w, "Size expected", 500)
 				return
 			}
 			i, err := strconv.ParseUint(size, 10, 64)
 			if err != nil {
-				panic(err)
+				// panic(err)
+				return
 			}
 			network_data_handler.SetFullSize(i)
 			w.Write([]byte(`1`))
 			return
 		}
+	case "Broke":
+		if ip == network_data_handler.RecieverIP {
+			network_data_handler.BreakUpload()
+			gui.UploadDone()
+			gui.Alert("Reciever canceled transaction")
+		}
 	}
-
-	// w.Header().Set("content-type", "application/json")
 	w.Write([]byte(`1`))
-	// log.Println(nCommand["data"])
 }

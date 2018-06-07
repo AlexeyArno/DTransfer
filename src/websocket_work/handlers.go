@@ -1,7 +1,6 @@
 package websocket_work
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
@@ -32,7 +31,7 @@ func init() {
 func DataHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := websocket.Upgrade(w, r, nil, network_data_handler.BufferSize, network_data_handler.BufferSize)
 	if err != nil {
-		log.Println("Data Handler 1 ", err)
+		// log.Println("Data Handler 1 ", err)
 		return
 	}
 	ip := r.Host
@@ -56,11 +55,11 @@ func WebsocketService() {
 
 		case c := <-enteringData:
 			if c.conn == nil {
-				log.Println("Data channel faile")
+				// log.Println("Data channel faile")
 				return
 			}
 			if network_data_handler.MachineIsHere(c.conn) {
-				log.Println("Websocket Work 1:", "machine already exist")
+				// log.Println("Websocket Work 1:", "machine already exist")
 				c.conn.Close()
 				continue
 			}

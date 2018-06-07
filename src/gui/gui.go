@@ -2,9 +2,9 @@ package gui
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_client"
 	"github.com/AlexeyArno/golang-files-transfer/src/network_data_handler"
 
 	gui_js_api "github.com/AlexeyArno/golang-files-transfer/src/gui_js_api"
@@ -29,13 +29,16 @@ func HandleRPC(w webview.WebView, data string) {
 		go network_data_handler.BreakUpload()
 	case data == "continueUpload":
 		go network_data_handler.ContinueUpload()
+	case data == "breakDownload":
+		go network_data_handler.BreakDownload()
+		go network_client.SendBrokeRequest(network_data_handler.SenderIP)
 	case data == "getDashboardData":
 		gui_js_api.GetDashboardData(currentWindow)
 	case data == "getDashboardDataDownload":
 		gui_js_api.GetDashboardDataDownload(&w)
 	case strings.HasPrefix(data, "acceptTransitOffer:"):
 		IP := strings.TrimPrefix(data, "acceptTransitOffer:")
-		log.Println("I accept to ", IP)
+		// log.Println("I accept to ", IP)
 		network_data_handler.DownloadPath = gui_js_api.OpenDir(&w)
 		network_data_handler.SenderIP = IP
 		network_data_handler.DonwloadDoneCallback = DownloadDone
@@ -44,7 +47,7 @@ func HandleRPC(w webview.WebView, data string) {
 		break
 	case strings.HasPrefix(data, "cancelTransitOffer:"):
 		IP := strings.TrimPrefix(data, "cancelTransitOffer:")
-		log.Println("I dismiss to ", IP)
+		// log.Println("I dismiss to ", IP)
 		network_data_handler.SenderIP = ""
 		network_data_handler.DownloadPath = ""
 		sendCancelOffer(IP)
@@ -58,14 +61,14 @@ func HandleRPC(w webview.WebView, data string) {
 		var dat map[string]string
 
 		if err := json.Unmarshal([]byte(data), &dat); err != nil {
-			log.Println("Handle RPC: ", err)
+			// log.Println("Handle RPC: ", err)
 			return
 		}
 
 		if ip, ok := dat["ip"]; ok {
 			network_data_handler.RecieverIP = ip
 		} else {
-			log.Println("handelRPC startLoad 2: 'ip' doesnt exist")
+			// log.Println("handelRPC startLoad 2: 'ip' doesnt exist")
 			return
 		}
 

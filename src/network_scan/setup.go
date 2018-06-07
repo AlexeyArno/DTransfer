@@ -19,7 +19,7 @@ func SetupSanner() {
 		log.Println("Setup: ", err)
 		return
 	}
-	log.Println("My Address:", myAddress)
+	// log.Println("My Address:", myAddress)
 	go Listen(myAddress, port, IPFound, &messages)
 	go BroadcastTo(myAddress, port, &messages)
 	ScanNetwork()
@@ -33,5 +33,5 @@ func ScanNetwork() {
 }
 
 func IPFound(ip string) {
-	log.Println("Ip Found: ", ip)
+	// log.Println("Ip Found: ", ip)
 }

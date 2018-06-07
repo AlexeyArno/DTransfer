@@ -3,7 +3,6 @@ package network_client
 import (
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 )
@@ -21,7 +20,7 @@ var client = &http.Client{
 func sendRequest(dataFinal *map[string]interface{}, headers *map[string]string, IP string) (*http.Response, error) {
 	var req *http.Request
 	var err error
-	log.Println("Send to: ", "http://"+IP+"/info")
+	// log.Println("Send to: ", "http://"+IP+"/info")
 	if dataFinal != nil {
 		by := new(bytes.Buffer)
 		json.NewEncoder(by).Encode(dataFinal)
