@@ -64,3 +64,23 @@ func ShippedOfferCanceled(reason string) {
 		(*currentWindow).Eval(s)
 	})
 }
+
+func UploadDone() {
+	if currentWindow == nil {
+		return
+	}
+	(*currentWindow).Dispatch(func() {
+		s := fmt.Sprintf(`uploadDone()`)
+		(*currentWindow).Eval(s)
+	})
+}
+
+func DownloadDone() {
+	if currentWindow == nil {
+		return
+	}
+	(*currentWindow).Dispatch(func() {
+		s := fmt.Sprintf(`breakDownload()`)
+		(*currentWindow).Eval(s)
+	})
+}

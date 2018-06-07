@@ -438,17 +438,30 @@
             var circleLoader2 = document.getElementById("circleLoader2");
 
             var now  = initialTheta
+            var stop = false
             function doAnim() {
                 if(now>=360){
                     now = 0
                 }
 
                 circleLoader.style['-ms-transform'] = "rotate(" + now + "deg)"
-                 now += thetaDelta; 
-                 sleep(10, doAnim)
+                now += thetaDelta; 
+                if (stop) {
+                    stop = false
+                    return
+                }
+                sleep(10, doAnim)
             }
 
-            doAnim()
+            function StartLoaderAnimation(){
+                doAnim()
+            }
+
+            function StopLoaderAnimation(){
+                stop = true 
+            }
+
+            
 
             function sleep (time, resolve) {
                     (function (resolve) {
@@ -457,16 +470,6 @@
                         },time)
                     })(resolve)
                 }  
-
-
-            var requestAnimationFrameID 
-            function StartLoaderAnimation(){
-                // requestAnimationFrameID = requestAnimationFrame(doAnim)
-            }
-
-            function StopLoaderAnimation(){
-                // cancelAnimationFrame(requestAnimationFrameID)
-            }
 
             circleLoader.currentTheta = initialTheta; // The initial rotation angle to use when the animation starts, stored in a custom property.
 
@@ -477,6 +480,7 @@
                 var interval
                 var fileEl = document.getElementById("dash_file")
                 var speedEl = document.getElementById("dash_speed")
+                
                 function beginRefreshDashboard(){
                     clearInterval(interval)
                     interval = setInterval(function(){
@@ -493,7 +497,7 @@
                     speedEl.innerHTML = "0 B/s"
                 }
 
-                function refreshDashboard(file, speed){
+                function refreshDashboard(file, speed, progressor){
                     if(file.length >= 14){
                         file = file.substr(file.length-14, file.length-1)
                     }
@@ -509,8 +513,9 @@
                             break
                     }
                     speed = Math.round( speed * 10 ) / 10
-                    fileEl.innerHTML = file
+                    fileEl.innerHTML =  "..."+file
                     speedEl.innerHTML = speed+suffix
+                    progress(progressor)
                     
                 }
             </script>
@@ -556,13 +561,23 @@
                 }
 
                 function breakLoad(){
+                    if (downloadNow){
+                        breakDownload()
+                        return
+                    }
                     window.external.invoke("breakUpload")
-                    stopRefreshDashboard()
+                    uploadDone()
                     clearDashBoard()
+                }
+
+                function uploadDone(){
+                    stopRefreshDashboard()
+                    progress(100)
                     uploadNow = false
                     stopEl.style.display = 'none'
                     breakEl.style.display = 'none'
                     beginEl.style.display = 'inline-block'
+
                 }
 
                 function offerAccepted(){
@@ -582,6 +597,50 @@
                 }
 
             </script>
+            <script>
+                var downloadNow = false
+                
+                var downloadInterval
+
+                  
+                function beginRefreshDashboardDwonload(){
+                    clearInterval(downloadInterval)
+                    downloadInterval = setInterval(function(){
+                        window.external.invoke("getDashboardDataDownload")
+                    }, 1000);
+                }
+
+                function stopRefreshDashboardDownload(){
+                    clearInterval(downloadInterval)
+                } 
+
+                function startDownload(){
+                    downloadNow = true
+                    
+                    beginEl.style.display = 'none'
+                    breakEl.style.display = "inline-block"
+                    
+                    beginRefreshDashboardDwonload()
+                }
+
+                function breakDownload(){
+                    downloadNow = false
+                    stopRefreshDashboardDownload()
+                    progress(0)
+                    window.external.invoke("breakDownload")
+                    beginEl.style.display = 'inline-block'
+                    breakEl.style.display   = "none"
+                }
+
+                function refreshDashboardDownload(file,  progressor){
+                    if(file.length >= 14){
+                        file = file.substr(file.length-14, file.length-1)
+                    }
+                    fileEl.innerHTML = "..."+file
+                    progress(progressor)
+                }
+
+            </script>
             <!-- New Transit Offers -->
             <script>    
 
@@ -593,7 +652,8 @@
 
                 offer_yes.addEventListener('click', function(){
                     window.external.invoke('acceptTransitOffer:'+offersSequence[offersSequence.length - 1].IP);
-                    next();
+                    startDownload();
+                    clear();
                 })
                 
                 offer_no.addEventListener('click', function(){
@@ -625,6 +685,12 @@
                    
                 }
 
+                function clear(){
+                    offer.style.top = '430px'
+                    offersSequence= []
+
+                }
+
                 function next(){
                     offer.style.top = '430px'
 
@@ -645,11 +711,6 @@
 
             </script>
             <script>
-               
-
-
-
-
                 document.getElementById('choose').addEventListener("click", chooseFunc);
                 document.getElementById("reload_ips").addEventListener("click", reloadConnectedIPs)
                 
@@ -710,11 +771,6 @@
                     if(window.transData.path.length>=10){path = '...'+path.substr(path.length - 7)}
                     document.getElementById('choosen_directory').innerHTML = path;
                 }
-
-                function beginFunc(){
-                    
-                }
-
 
             </script>
     </body>

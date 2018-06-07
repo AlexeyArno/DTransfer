@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_client"
+
 	"github.com/AlexeyArno/golang-files-transfer/src/fs"
 	"github.com/gorilla/websocket"
 )
@@ -26,6 +28,11 @@ var packetCounter uint8
 
 var packetSum uint32 = 0
 var packetTime uint32 = 0
+
+var totalPacketSendCount uint64 = 0
+
+var totalDirSizeByte uint64
+var nowBytesTransfered uint64
 
 func StopUpload() {
 	if !uploadNow {
@@ -58,8 +65,9 @@ func init() {
 }
 
 // StartSending very well
-func StartSending() {
-
+func StartSending(uploadDoneCallback func()) {
+	totalDirSizeByte = fs.DirSizeByte(UploadPath)
+	network_client.SendFullSize(totalDirSizeByte, RecieverIP)
 	log.Println("RecieverIP: ", RecieverIP)
 	fs.SetPath(UploadPath)
 	conn, err := GetConnectionByIP(RecieverIP)
@@ -71,35 +79,43 @@ func StartSending() {
 	}
 	uploadNow = true
 	defer func() { uploadNow = false }()
-	workWithFiles()
+	workWithFiles(uploadDoneCallback)
+
 	// go getFiles()
 }
 
-func workWithFiles() {
+func workWithFiles(uploadDoneCallback func()) {
 	log.Println("Work with files")
 	if !uploadNow {
 		return
 	}
-	path, idDir, err := fs.Next()
+	path, isDir, err := fs.Next()
 	if err != nil {
 		log.Println("StartSending: ", err)
+		if nowBytesTransfered == totalDirSizeByte {
+			fs.Clear()
+			network_client.SendDoneRequest(totalPacketSendCount, RecieverIP)
+			uploadDoneCallback()
+		}
 		return
 	}
-	if !idDir {
+	if !isDir {
 		currentPathLocker.Lock()
 		currentPath = path
 		currentPathLocker.Unlock()
-		err = readChunkAndSend(path)
+		network_client.SendNewFileOffer(path, RecieverIP)
+		err = readChunkAndSend(UploadPath+path, uploadDoneCallback)
 		if err != nil {
 			log.Println("StartSending 2: ", err)
 			return
 		}
+	} else {
+		network_client.SendNewDirectoryOffer(path, RecieverIP)
 	}
-	time.Sleep(time.Second)
-	workWithFiles()
+	workWithFiles(uploadDoneCallback)
 }
 
-func readChunkAndSend(path string) error {
+func readChunkAndSend(path string, uploadDoneCallback func()) error {
 
 	log.Println("Read Chunk ", path)
 
@@ -114,12 +130,12 @@ func readChunkAndSend(path string) error {
 	data := make([]byte, DataSize)
 
 	for {
-
 		select {
 		case _ = <-stopChannel:
 			<-continueChannel
 		case _ = <-breakChannel:
 			fs.Clear()
+			network_client.SendBrokeRequest(RecieverIP)
 			log.Println("Im breaking")
 			return errors.New("Sender break upload")
 		default:
@@ -149,7 +165,8 @@ func send(n int, data *[]byte) error {
 		log.Println("Send file_send:", err)
 		return err
 	}
-	// log.Println("Send Chunk ", n)
+	// bytsCount := binary.LittleEndian.Uint32(finData[:4])
+
 	packetSum += uint32(n)
 	packetTime += uint32((time.Now().UnixNano() - begin) / int64(time.Millisecond))
 	if packetCounter >= 10 {
@@ -159,7 +176,32 @@ func send(n int, data *[]byte) error {
 		lastPacketTimeLocker.Unlock()
 		packetCounter = 0
 	}
+	nowBytesTransfered += uint64(n)
+	log.Println("Sended  ", nowBytesTransfered, "/", totalDirSizeByte, " KB")
+	totalPacketSendCount++
 	packetCounter++
 
 	return nil
+}
+
+func GetSpeed() uint32 {
+	lastPacketTimeLocker.Lock()
+	if last10PacketTime == 0 {
+		last10PacketTime = 1
+	}
+	ret := (last10PacketSize / last10PacketTime) * 1000
+	lastPacketTimeLocker.Unlock()
+	return ret
+	// return uint64(finish)
+}
+
+func GetCurrentPath() string {
+	currentPathLocker.Lock()
+	ret := currentPath
+	currentPathLocker.Unlock()
+	return ret
+}
+
+func GetProgress() uint8 {
+	return uint8((float64(nowBytesTransfered) / float64(totalDirSizeByte)) * 100)
 }

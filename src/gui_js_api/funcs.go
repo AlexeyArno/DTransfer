@@ -40,7 +40,17 @@ func GetConnectedIPs(w *webview.WebView) {
 func GetDashboardData(w *webview.WebView) {
 	speed := network_data_handler.GetSpeed()
 	path := network_data_handler.GetCurrentPath()
-	s := fmt.Sprintf(`refreshDashboard("%s", %d)`, path, speed)
-	log.Println("GuiJSApi: ", s)
+	progress := network_data_handler.GetProgress()
+	log.Println("Progress: ", progress, "%")
+	s := fmt.Sprintf(`refreshDashboard("%s", %d, %d)`, path, speed, progress)
+	(*w).Eval(s)
+}
+
+func GetDashboardDataDownload(w *webview.WebView) {
+	path := network_data_handler.GetDownloadPath()
+	progress := network_data_handler.GetDownloadProgress()
+
+	log.Println("Progress Download: ", progress, "%")
+	s := fmt.Sprintf(`refreshDashboardDownload("%s", %d)`, path, progress)
 	(*w).Eval(s)
 }

@@ -3,6 +3,7 @@ package network_data_handler
 import (
 	"sync"
 
+	"github.com/AlexeyArno/golang-files-transfer/src/network_client"
 	"github.com/gorilla/websocket"
 )
 
@@ -36,31 +37,14 @@ var (
 	machinesLocker = &sync.Mutex{}
 )
 
-var DownloadPacketSequence chan (Packet)
+var DownloadPacketSequence chan (Packet) = make(chan Packet, 1)
 var UploadPacketSequence chan (Packet)
 
-func RegisterTCPPort(IP string) {
-	TCPPort = IP
+func RegisterTCPPort(port string) {
+	TCPPort = port
+	network_client.RegTCP(port)
 }
 
 func RegisterPartnerConn(conn *websocket.Conn) {
 	PartnerConn = conn
-}
-
-func GetSpeed() uint32 {
-	lastPacketTimeLocker.Lock()
-	if last10PacketTime == 0 {
-		last10PacketTime = 1
-	}
-	ret := (last10PacketSize / last10PacketTime) * 1000
-	lastPacketTimeLocker.Unlock()
-	return ret
-	// return uint64(finish)
-}
-
-func GetCurrentPath() string {
-	currentPathLocker.Lock()
-	ret := currentPath
-	currentPathLocker.Unlock()
-	return ret
 }

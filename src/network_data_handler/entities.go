@@ -8,7 +8,9 @@ import (
 )
 
 type Packet struct {
-	IP   string
+	IP string
+	// 4 first bytes are number of useful data
+	// Other 1-17200 bytes is useful data
 	Data []byte
 }
 

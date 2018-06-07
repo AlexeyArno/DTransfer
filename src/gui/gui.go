@@ -31,11 +31,15 @@ func HandleRPC(w webview.WebView, data string) {
 		go network_data_handler.ContinueUpload()
 	case data == "getDashboardData":
 		gui_js_api.GetDashboardData(currentWindow)
+	case data == "getDashboardDataDownload":
+		gui_js_api.GetDashboardDataDownload(&w)
 	case strings.HasPrefix(data, "acceptTransitOffer:"):
 		IP := strings.TrimPrefix(data, "acceptTransitOffer:")
 		log.Println("I accept to ", IP)
 		network_data_handler.DownloadPath = gui_js_api.OpenDir(&w)
 		network_data_handler.SenderIP = IP
+		network_data_handler.DonwloadDoneCallback = DownloadDone
+		network_data_handler.BeginDownload()
 		sendAcceptOffer(IP)
 		break
 	case strings.HasPrefix(data, "cancelTransitOffer:"):

@@ -76,10 +76,10 @@ func Next() (string, bool, error) {
 			if f.IsDir() {
 				Dirs++
 				currentPath = currentPath + "/" + f.Name()
-				return beginPath + currentPath, true, nil
+				return currentPath, true, nil
 			} else {
 				Files++
-				return beginPath + currentPath + "/" + f.Name(), false, nil
+				return currentPath + "/" + f.Name(), false, nil
 			}
 		} else {
 			visitedCount++
