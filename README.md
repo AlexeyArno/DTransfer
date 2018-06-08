@@ -15,7 +15,9 @@
 $ go get github.com/AlexeyArno/DTransfer
 $ cd GOPATH/src/github.com/AlexeyArno/DTransfer
 $ go get -d ./...
-
+```
+#### Build
+```
 # Linux
 $ go build -o DTransfer && ./DTransfer
 
