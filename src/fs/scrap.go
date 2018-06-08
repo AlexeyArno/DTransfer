@@ -14,21 +14,25 @@ var limiter uint64 = 100
 
 var counter uint64
 
-var Dirs uint64 = 0
-var Files uint64 = 0
+var dirsAmount uint64
+var filesAmount uint64
 
+// history of crawler
 var visited []string
 
+// Clear history
 func Clear() {
 	visited = visited[:0]
 }
 
+//SetPath - set new path to dir
 func SetPath(p string) {
 	currentPath = ""
 	beginPath = p
-	Dirs = 0
+	dirsAmount = 0
 }
 
+// pathBack - return to the previous level in the file system hierarchy
 func pathBack() {
 	deleteIndexes := []int{}
 	for i, v := range visited {
@@ -50,10 +54,12 @@ func pathBack() {
 	}
 }
 
+// GetStat return amount Files and Dirs
 func GetStat() (uint64, uint64) {
-	return Files, Dirs
+	return filesAmount, dirsAmount
 }
 
+// inVisited - return is there a file in the history
 func inVisited(path string) bool {
 	for _, j := range visited {
 		if path == j {
@@ -63,6 +69,7 @@ func inVisited(path string) bool {
 	return false
 }
 
+// Next - simple generator for crawling directories
 func Next() (string, bool, error) {
 	files, err := ioutil.ReadDir(beginPath + "/" + currentPath)
 	if err != nil {
@@ -74,11 +81,11 @@ func Next() (string, bool, error) {
 		if !inVisited(currentPath + "/" + f.Name()) {
 			visited = append(visited, currentPath+"/"+f.Name())
 			if f.IsDir() {
-				Dirs++
+				dirsAmount++
 				currentPath = currentPath + "/" + f.Name()
 				return currentPath, true, nil
 			} else {
-				Files++
+				filesAmount++
 				return currentPath + "/" + f.Name(), false, nil
 			}
 		} else {
@@ -87,12 +94,12 @@ func Next() (string, bool, error) {
 	}
 	if visitedCount == len(files) {
 		if currentPath == "" {
-			visited = visited[:0]
+			Clear()
 			return "", false, errors.New("All visited")
 		}
 		pathBack()
 		return Next()
 	}
-	visited = visited[:0]
+	Clear()
 	return "", false, errors.New("All visited")
 }

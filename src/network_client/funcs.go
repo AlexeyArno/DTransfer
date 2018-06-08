@@ -17,6 +17,7 @@ var client = &http.Client{
 	Transport: tr,
 }
 
+// sendRequest send simple http request
 func sendRequest(dataFinal *map[string]interface{}, headers *map[string]string, IP string) (*http.Response, error) {
 	var req *http.Request
 	var err error

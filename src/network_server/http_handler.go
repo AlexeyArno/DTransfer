@@ -3,6 +3,7 @@ package network_server
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -47,13 +48,13 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 	case "Accept-Offer":
 		// go start
 		network_data_handler.RecieverIP = ip
-		// log.Println(ip, " accepted your offer")
+		log.Println(ip, " accepted your offer")
 		gui.ShippedOfferAccepted()
-		go network_data_handler.StartSending(gui.UploadDone)
+		go network_data_handler.StartSending()
 
 		break
 	case "Cancel-Offer":
-		// log.Println(ip, " canceled your offer")
+		log.Println(ip, " canceled your offer")
 		network_data_handler.RecieverIP = ""
 		gui.ShippedOfferCanceled(ip + " disline your offer")
 		break
@@ -98,6 +99,7 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 				// panic(err)
 				return
 			}
+			// Setup reqiured amount Packets whole transaction
 			network_data_handler.Done(i)
 			w.Write([]byte(`1`))
 			return
@@ -117,6 +119,7 @@ func InfoHandler(w http.ResponseWriter, req *http.Request) {
 				// panic(err)
 				return
 			}
+			// Set required amount bytes whole transaction
 			network_data_handler.SetFullSize(i)
 			w.Write([]byte(`1`))
 			return

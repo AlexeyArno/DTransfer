@@ -20,6 +20,7 @@ func GetCleanIPFromString(myAddress string) string {
 	return strings.Split(myAddress, ":")[0]
 }
 
+// Return hosted machine's IP in local network
 func MyIP() (string, error) {
 	myAddress := ""
 	addrs, err := net.InterfaceAddrs()

@@ -6,32 +6,29 @@ import (
 	"github.com/AlexeyArno/golang-files-transfer/src/utility"
 )
 
-var messages chan (string) = make(chan string, 4)
+var messages = make(chan (string), 4)
 
+//SetupSanner - Setup and start network scanner
 func SetupSanner() {
 	myAddress, err := utility.MyIP()
 	if err != nil {
-		log.Println(err)
+		log.Println("SetupScanner 1: ", err)
 		return
 	}
 	port, err := ReservUDPPort()
 	if err != nil {
-		log.Println("Setup: ", err)
+		log.Println("SetupScanner 2: ", err)
 		return
 	}
-	// log.Println("My Address:", myAddress)
-	go Listen(myAddress, port, IPFound, &messages)
-	go BroadcastTo(myAddress, port, &messages)
+	log.Println("My Address:", myAddress)
+	go Listen(myAddress, port, &messages)
+	go BroadcastOn(myAddress, port, &messages)
 	ScanNetwork()
-
 }
 
+//ScanNetwork - Send broadcast request in local network with several UDP ports
 func ScanNetwork() {
 	for _, j := range AvailabalePortsUDP {
 		messages <- "255.255.255.255:" + j
 	}
-}
-
-func IPFound(ip string) {
-	// log.Println("Ip Found: ", ip)
 }

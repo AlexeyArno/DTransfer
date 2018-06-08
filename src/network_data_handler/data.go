@@ -10,7 +10,7 @@ import (
 var TCPPort string
 
 var (
-	UploadPath   string = `D:\GOPATH\src\github.com\AlexeyArno\golang-files-transfer\src`
+	UploadPath   string
 	DownloadPath string
 )
 
@@ -37,14 +37,22 @@ var (
 	machinesLocker = &sync.Mutex{}
 )
 
-var DownloadPacketSequence chan (Packet) = make(chan Packet, 1)
+//DownloadPacketSequence , UploadPacketSequence - channels for send and get packets between machines
+var DownloadPacketSequence = make(chan Packet, 1)
 var UploadPacketSequence chan (Packet)
 
+// UploadCallback , DownloadCallback Functions for call after Upload or Download done
+var UploadCallback func()
+var DownloadCallback func()
+
+// RegisterTCPPort set TCP port for our app
 func RegisterTCPPort(port string) {
 	TCPPort = port
 	network_client.RegTCP(port)
 }
 
+// RegisterPartnerConn set reciever or sender IP
+// depending on load type
 func RegisterPartnerConn(conn *websocket.Conn) {
 	PartnerConn = conn
 }

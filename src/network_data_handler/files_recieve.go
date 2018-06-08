@@ -3,6 +3,7 @@ package network_data_handler
 import (
 	"bytes"
 	"encoding/binary"
+	"log"
 	"os"
 	"sync"
 )
@@ -48,22 +49,26 @@ func SetFullSize(size uint64) {
 	needSizeBytes = size
 }
 
+func breakDownloadNative() {
+	bytesWritten = 0
+	pocketsNow = 0
+	currentFile.Close()
+	DonwloadDoneCallback()
+}
+
+// GetDownloadProgress - return [0:100] percent progress
 func GetDownloadProgress() uint8 {
 	// log.Println(bytesWritten, needSizeBytes, " KB")
 	return uint8((float64(bytesWritten) / float64(needSizeBytes)) * 100)
 }
 
+// Done - sender done send packets
 func Done(pockets uint64) {
 	PocketsLocker.Lock()
 	needPockets = pockets
 	PocketsLocker.Unlock()
-	// log.Println("Done! ", pocketsNow, pockets)
 	if bytesWritten == needSizeBytes && needSizeBytes != 0 {
-		// log.Println("Close 3")
-		bytesWritten = 0
-		pocketsNow = 0
-		currentFile.Close()
-		DonwloadDoneCallback()
+		breakDownloadNative()
 	}
 }
 
@@ -74,10 +79,12 @@ func GetDownloadPath() string {
 	return path
 }
 
+// GetCurrentRelativePath return current downloading file
 func GetCurrentRelativePath() string {
 	return currentRelativeFilesPath
 }
 
+// ChangeRelativeDownloadPath open or create new file
 func ChangeRelativeDownloadPath(newPath string) {
 	pathLocker.Lock()
 	currentRelativeFilesPath = newPath
@@ -87,7 +94,6 @@ func ChangeRelativeDownloadPath(newPath string) {
 		return
 	}
 	currentFile = file
-	// bytesWritten = 0
 	pathLocker.Unlock()
 }
 
@@ -95,6 +101,7 @@ func init() {
 	go startRecieve()
 }
 
+// startRecieve listening all packets
 func startRecieve() {
 	for {
 		select {
@@ -102,30 +109,25 @@ func startRecieve() {
 			if pct.IP == SenderIP && donwloadNow {
 				recieve(pct.IP, pct.Data)
 				if bytesWritten == needSizeBytes && needSizeBytes != 0 {
-					pocketsNow = 0
-					bytesWritten = 0
-					currentFile.Close()
-					DonwloadDoneCallback()
+					breakDownloadNative()
 				}
 			}
 		case _ = <-breakChannelDownload:
-			pocketsNow = 0
-			bytesWritten = 0
-			donwloadNow = false
-			currentFile.Close()
-			DonwloadDoneCallback()
+			breakDownloadNative()
 		}
 	}
 }
 
 func recieve(IP string, data []byte) {
+	// Get usefull amount byts
 	var bytsCount int32
 	buf := bytes.NewBuffer((data)[:4])
 	binary.Read(buf, binary.LittleEndian, &bytsCount)
 
+	// Write bytes to current file
 	_, err := currentFile.Write(data[4 : bytsCount+4])
 	if err != nil {
-		// log.Println("Recive last: ", err)
+		log.Println("Recive last: ", err)
 		return
 	}
 

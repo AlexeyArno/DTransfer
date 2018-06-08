@@ -13,8 +13,6 @@ import (
 	"github.com/zserge/webview"
 )
 
-var close = make(chan struct{})
-
 func main() {
 	log.SetOutput(ioutil.Discard)
 	port, err := network_scan.ReservTCPPort()
@@ -23,7 +21,7 @@ func main() {
 	}
 
 	network_data_handler.RegisterTCPPort(port)
-	// log.Println("Listen TCP port: ", port)
+	log.Println("Listen TCP port: ", port)
 
 	go network_scan.SetupSanner()
 
@@ -55,6 +53,4 @@ func main() {
 	gui.RegisterGUI(&w)
 	defer w.Exit()
 	w.Run()
-	// <-close
-
 }

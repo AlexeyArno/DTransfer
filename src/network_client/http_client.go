@@ -9,6 +9,8 @@ import (
 var MyIP string
 var myTCPPort string
 
+// RegTCP - set TCP port for package to request
+// that _reciever know on which port send answer
 func RegTCP(port string) {
 	myTCPPort = port
 }
@@ -21,6 +23,7 @@ func init() {
 	MyIP = ip
 }
 
+// SendOffer - send to Reciever offer for begin transaction
 func SendOffer(directoryName, ip string) error {
 	dataFinal := map[string]interface{}{"data": directoryName}
 	headers := map[string]string{"Command-Type": "Offer", "Requester-IP": MyIP + ":" + myTCPPort}
@@ -33,6 +36,7 @@ func SendOffer(directoryName, ip string) error {
 	return nil
 }
 
+// SendAcceptOffer - send positive answer to Sender request
 func SendAcceptOffer(ip string) error {
 	headers := map[string]string{"Command-Type": "Accept-Offer",
 		"Requester-IP": MyIP + ":" + myTCPPort}
@@ -44,6 +48,7 @@ func SendAcceptOffer(ip string) error {
 	return nil
 }
 
+// SendCancelOffer - send negative answer to Sender requester
 func SendCancelOffer(ip string) error {
 	headers := map[string]string{"Command-Type": "Cancel-Offer",
 		"Requester-IP": MyIP + ":" + myTCPPort}
@@ -56,6 +61,7 @@ func SendCancelOffer(ip string) error {
 	return nil
 }
 
+// SendNewFileOffer - send to Reciever request create new file
 func SendNewFileOffer(relativePath string, ip string) error {
 	headers := map[string]string{"Command-Type": "File",
 		"Requester-IP": MyIP + ":" + myTCPPort,
@@ -69,6 +75,7 @@ func SendNewFileOffer(relativePath string, ip string) error {
 	return nil
 }
 
+//  SendNewDirectoryOffer - send to Reciever request create new dir
 func SendNewDirectoryOffer(relativePath string, ip string) error {
 	headers := map[string]string{"Command-Type": "Dir",
 		"Requester-IP": MyIP + ":" + myTCPPort,
@@ -82,6 +89,7 @@ func SendNewDirectoryOffer(relativePath string, ip string) error {
 	return nil
 }
 
+// SendDoneRequest - send to Reciever message that sender done read and send
 func SendDoneRequest(packetCount uint64, ip string) error {
 	headers := map[string]string{"Command-Type": "Done",
 		"Requester-IP": MyIP + ":" + myTCPPort,
@@ -95,6 +103,7 @@ func SendDoneRequest(packetCount uint64, ip string) error {
 	return nil
 }
 
+// SendBrokeRequest - send offer for break send to Sender
 func SendBrokeRequest(ip string) error {
 	headers := map[string]string{"Command-Type": "Broke",
 		"Requester-IP": MyIP + ":" + myTCPPort}
@@ -107,6 +116,7 @@ func SendBrokeRequest(ip string) error {
 	return nil
 }
 
+// SendFullSize - send dir size to Reciever
 func SendFullSize(size uint64, ip string) error {
 	headers := map[string]string{"Command-Type": "Size",
 		"Requester-IP": MyIP + ":" + myTCPPort,

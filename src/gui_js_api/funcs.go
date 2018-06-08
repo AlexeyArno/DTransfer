@@ -10,6 +10,7 @@ import (
 	webview "github.com/zserge/webview"
 )
 
+// OpenDir - open dialog as folder finder
 func OpenDir(w *webview.WebView) string {
 	answer := (*w).Dialog(webview.DialogTypeOpen, webview.DialogFlagDirectory, "Open directory", "")
 	answer = strings.Replace(answer, `\`, "/", -1)
@@ -19,6 +20,7 @@ func OpenDir(w *webview.WebView) string {
 	return answer
 }
 
+// UpdateIP - update users app's IP in GUI window
 func UpdateIP(w *webview.WebView) {
 	IP, err := utility.MyIP()
 	if err == nil {
@@ -29,6 +31,7 @@ func UpdateIP(w *webview.WebView) {
 	}
 }
 
+// GetConnectedIPs - return now connected machines IP's
 func GetConnectedIPs(w *webview.WebView) {
 	IPs := network_data_handler.GetConnectedIPs()
 	log.Println(IPs)
@@ -37,6 +40,7 @@ func GetConnectedIPs(w *webview.WebView) {
 	(*w).Eval(s)
 }
 
+// GetDashboardData - return data for uploader
 func GetDashboardData(w *webview.WebView) {
 	speed := network_data_handler.GetSpeed()
 	path := network_data_handler.GetCurrentPath()
@@ -46,6 +50,7 @@ func GetDashboardData(w *webview.WebView) {
 	(*w).Eval(s)
 }
 
+// GetDashboardDataDownload - return data for downloader
 func GetDashboardDataDownload(w *webview.WebView) {
 	path := network_data_handler.GetCurrentRelativePath()
 	progress := network_data_handler.GetDownloadProgress()

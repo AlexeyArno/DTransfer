@@ -11,8 +11,8 @@ var (
 	usefullIps []string
 )
 
-// Listen return hello
-func Listen(myAddressWPort string, port string, ipFound func(string), messages *chan string) {
+// Listen UDP requests
+func Listen(myAddressWPort string, port string, messages *chan string) {
 
 	ServerAddr, err := net.ResolveUDPAddr("udp", ":"+port)
 	if err != nil {
@@ -31,14 +31,11 @@ func Listen(myAddressWPort string, port string, ipFound func(string), messages *
 	buf := make([]byte, 1024)
 	for {
 		n, addr, err := ServerConn.ReadFromUDP(buf)
-		// cleanIP := utility.GetCleanIPFromString(addr.String())
-		// fmt.Println(cleanIP)
+		// If requester IP+port !equal our app's IP+port
 		if addr.String() != myAddressWPort+":"+port {
-			if !stringInSlice(string(buf[0:n]), usefullIps) {
-				// 	gotUsefullIP(cleanIP, port)
-				go websocket_work.ConnectTo(string(buf[0:n]))
-			}
-			// go websocket_work.ConnectTo(ip + ":" + port)
+			// if !stringInSlice(string(buf[0:n]), usefullIps) {
+			go websocket_work.ConnectTo(string(buf[0:n]))
+			// }
 		}
 		if err != nil {
 			log.Println("Error: ", err)
@@ -46,21 +43,19 @@ func Listen(myAddressWPort string, port string, ipFound func(string), messages *
 	}
 }
 
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
+// func stringInSlice(a string, list []string) bool {
+// 	for _, b := range list {
+// 		if b == a {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
-func gotUsefullIP(ip string, myport string) {
-
-	IPFound(ip)
-	for _, port := range AvailabalePortsTCP {
-		if port != myport {
-			go websocket_work.ConnectTo(ip + ":" + port)
-		}
-	}
-}
+// func gotUsefullIP(ip string, myport string) {
+// 	for _, port := range AvailabalePortsTCP {
+// 		if port != myport {
+// 			go websocket_work.ConnectTo(ip + ":" + port)
+// 		}
+// 	}
+// }

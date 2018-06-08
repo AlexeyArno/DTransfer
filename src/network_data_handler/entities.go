@@ -2,7 +2,6 @@ package network_data_handler
 
 import (
 	"errors"
-	"log"
 
 	"github.com/gorilla/websocket"
 )
@@ -77,9 +76,7 @@ func DeleteMachine(w *websocket.Conn) {
 func GetConnectedIPs() []string {
 	var finish []string
 	machinesLocker.Lock()
-	log.Println(machines)
 	for _, j := range machines {
-		log.Println(j)
 		if j.dataConn != nil {
 			finish = append(finish, j.IP)
 		}

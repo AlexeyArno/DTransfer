@@ -1,6 +1,7 @@
 package gui
 
 import (
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -14,19 +15,19 @@ var tr = &http.Transport{
 	DisableCompression: true,
 }
 
-// startLoad: data = {"path": ..., "ip": 192...}
+// sendOffer - send offer for begin new transaction
 func sendOffer(data map[string]string) {
 	var Path, IP string
 	if path, ok := data["path"]; ok {
 		Path = path
 	} else {
-		// log.Println("startLoad 1: 'path' doesnt exist")
+		log.Println("startLoad 1: 'path' doesnt exist")
 		return
 	}
 	if ip, ok := data["ip"]; ok {
 		IP = ip
 	} else {
-		// log.Println("startLoad 2: 'ip' doesnt exist")
+		log.Println("startLoad 2: 'ip' doesnt exist")
 		return
 	}
 	splitPath := strings.Split(Path, "/")
@@ -34,7 +35,7 @@ func sendOffer(data map[string]string) {
 
 	err := network_client.SendOffer(directoryName, IP)
 	if err != nil {
-		// log.Println("sendOffer gui: ", err)
+		log.Println("sendOffer gui: ", err)
 	}
 
 }
@@ -42,7 +43,7 @@ func sendOffer(data map[string]string) {
 func sendAcceptOffer(IP string) {
 	err := network_client.SendAcceptOffer(IP)
 	if err != nil {
-		// log.Println("sendAcceptOffer gui: ", err)
+		log.Println("sendAcceptOffer gui: ", err)
 	}
 
 }
@@ -50,6 +51,6 @@ func sendAcceptOffer(IP string) {
 func sendCancelOffer(IP string) {
 	err := network_client.SendCancelOffer(IP)
 	if err != nil {
-		// log.Println("sendCancelOffer gui: ", err)
+		log.Println("sendCancelOffer gui: ", err)
 	}
 }

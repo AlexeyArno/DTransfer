@@ -38,18 +38,14 @@ func StopUpload() {
 	if !uploadNow {
 		return
 	}
-
 	stopChannel <- struct{}{}
-	// log.Println("StopUpload")
 }
 
 func BreakUpload() {
 	if !uploadNow {
 		return
 	}
-
 	breakChannel <- struct{}{}
-	// log.Println("BreakUpload")
 }
 
 func ContinueUpload() {
@@ -57,20 +53,28 @@ func ContinueUpload() {
 		return
 	}
 	continueChannel <- struct{}{}
-	// log.Println("ContinueUpload")
 }
 
-func init() {
-	// go initSending()
+func breakUploadNative() {
+	// Clear all data from dir crawler in fs
+	fs.Clear()
+	nowBytesTransfered = 0
+	totalPacketSendCount = 0
+	packetCounter = 0
+	packetTime = 0
+	network_client.SendDoneRequest(totalPacketSendCount, RecieverIP)
+	UploadCallback()
 }
 
-// StartSending very well
-func StartSending(uploadDoneCallback func()) {
+// StartSending - start scan and send data from selected dir = UploadPath
+func StartSending() {
 	breakChannel = make(chan (struct{}), 1)
+	// Get amount bytes in dir
 	totalDirSizeByte = fs.DirSizeByte(UploadPath)
+	// Send reciever amount
 	network_client.SendFullSize(totalDirSizeByte, RecieverIP)
-	// log.Println("RecieverIP: ", RecieverIP)
 	fs.SetPath(UploadPath)
+	// Connnect to reciever
 	conn, err := GetConnectionByIP(RecieverIP)
 	if err != nil {
 		log.Println("Start Sending: ", err)
@@ -80,28 +84,19 @@ func StartSending(uploadDoneCallback func()) {
 	}
 	uploadNow = true
 	defer func() { uploadNow = false }()
-	workWithFiles(uploadDoneCallback)
-
-	// go getFiles()
+	workWithFiles()
 }
 
-func workWithFiles(uploadDoneCallback func()) {
-	// log.Println("Work with files")
+func workWithFiles() {
 	if !uploadNow {
 		return
 	}
+	// Get next path
 	path, isDir, err := fs.Next()
 	if err != nil {
-		log.Println("StartSending: ", err)
-		log.Println("Transfered: ", nowBytesTransfered, "/", totalDirSizeByte)
+		// If all files visited
 		if nowBytesTransfered == totalDirSizeByte {
-			fs.Clear()
-			nowBytesTransfered = 0
-			totalPacketSendCount = 0
-			packetCounter = 0
-			packetTime = 0
-			network_client.SendDoneRequest(totalPacketSendCount, RecieverIP)
-			uploadDoneCallback()
+			breakUploadNative()
 		}
 		return
 	}
@@ -109,26 +104,25 @@ func workWithFiles(uploadDoneCallback func()) {
 		currentPathLocker.Lock()
 		currentPath = path
 		currentPathLocker.Unlock()
+		// Send reciever command create new file
 		network_client.SendNewFileOffer(path, RecieverIP)
-		err = readChunkAndSend(UploadPath+path, uploadDoneCallback)
+		err = readChunkAndSend(UploadPath + path)
 		if err != nil {
 			log.Println("StartSending 2: ", err)
 			return
 		}
 	} else {
+		// Send reciever command create new direcory
 		network_client.SendNewDirectoryOffer(path, RecieverIP)
 	}
-	workWithFiles(uploadDoneCallback)
+	workWithFiles()
 }
 
-func readChunkAndSend(path string, uploadDoneCallback func()) error {
-
-	// log.Println("Read Chunk ", path)
-
+func readChunkAndSend(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		fmt.Println("ReadChunkAndSend 1:", err)
+		return err
 	}
 
 	defer file.Close()
@@ -137,15 +131,14 @@ func readChunkAndSend(path string, uploadDoneCallback func()) error {
 
 	for {
 		select {
+		// If sender User click Stop
+		// We're just wait click Continue
 		case _ = <-stopChannel:
 			<-continueChannel
+		// User click break
+		// We're break all transaction
 		case _ = <-breakChannel:
-			fs.Clear()
-			network_client.SendBrokeRequest(RecieverIP)
-			nowBytesTransfered = 0
-			totalPacketSendCount = 0
-			packetCounter = 0
-			packetTime = 0
+			breakUploadNative()
 			return errors.New("Sender break upload")
 		default:
 			n, err := file.Read(data)
@@ -163,18 +156,20 @@ func readChunkAndSend(path string, uploadDoneCallback func()) error {
 
 func send(n int, data *[]byte) error {
 	finData := make([]byte, BufferSize)
+
+	//Create 4 byte for amount of usefull bytes
 	bs := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bs, uint32(n))
+
 	finData = append(bs, (*data)...)
 
 	begin := time.Now().UnixNano()
 
 	err := recieveConnection.WriteMessage(websocket.BinaryMessage, finData)
 	if err != nil {
-		// log.Println("Send file_send:", err)
+		log.Println("Send files_send:", err)
 		return err
 	}
-	// bytsCount := binary.LittleEndian.Uint32(finData[:4])
 
 	packetSum += uint32(n)
 	packetTime += uint32((time.Now().UnixNano() - begin) / int64(time.Millisecond))
@@ -186,13 +181,13 @@ func send(n int, data *[]byte) error {
 		packetCounter = 0
 	}
 	nowBytesTransfered += uint64(n)
-	// log.Println("Sended  ", nowBytesTransfered, "/", totalDirSizeByte, " KB")
 	totalPacketSendCount++
 	packetCounter++
 
 	return nil
 }
 
+// GetSpeed get middle speed for last 10 packets
 func GetSpeed() uint32 {
 	lastPacketTimeLocker.Lock()
 	if last10PacketTime == 0 {
@@ -204,6 +199,7 @@ func GetSpeed() uint32 {
 	// return uint64(finish)
 }
 
+// GetCurrentPath return current relative upload path
 func GetCurrentPath() string {
 	currentPathLocker.Lock()
 	ret := currentPath
@@ -211,6 +207,7 @@ func GetCurrentPath() string {
 	return ret
 }
 
+// GetProgress return [0:100] progress percent
 func GetProgress() uint8 {
 	return uint8((float64(nowBytesTransfered) / float64(totalDirSizeByte)) * 100)
 }
