@@ -6,7 +6,7 @@
 ##### 2. [Go-bindata](https://github.com/jteeuwen/go-bindata)
 ##### 3. [Gorilla Websocket](https://github.com/gorilla/websocket)
 
-![example](https://github.com/AlexeyArno/DTransfer/blob/master/present/1st.png)
+![example](https://i.imgur.com/W9TZfm3.png)
 
 ---
 #### Setup
